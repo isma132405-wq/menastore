@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MENASTORE | Artículos de Fútbol</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería oficial de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans">
+
+  <!-- Barra superior -->
+  <nav class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
+    <h1 class="text-2xl font-black tracking-wider text-emerald-400">MENA<span class="text-white">STORE</span></h1>
+    <span class="text-sm text-slate-400">Panel de Inventario y Tienda</span>
+  </nav>
+
+  <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Formulario para registrar productos en la BD -->
+    <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+      <h2 class="text-lg font-bold mb-4 border-b pb-2">Registrar Nuevo Producto</h2>
+      <form id="form-producto" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nombre del artículo</label>
+          <input type="text" id="nombre" required placeholder="Ej. Tacos Nike Mercurial" class="w-full border rounded-lg p-2.5 text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium mb-1">Precio (₡)</label>
+            <input type="number" id="precio" required min="1" placeholder="45000" class="w-full border rounded-lg p-2.5 text-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Stock</label>
+            <input type="number" id="stock" required min="1" placeholder="10" class="w-full border rounded-lg p-2.5 text-sm">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Categoría</label>
+          <select id="categoria" class="w-full border rounded-lg p-2.5 text-sm bg-white">
+            <option value="Calzado">Calzado</option>
+            <option value="Camisetas">Camisetas</option>
+            <option value="Balones">Balones</option>
+            <option value="Accesorios">Accesorios</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">URL de la imagen</label>
+          <input type="url" id="imagen" placeholder="https://..." class="w-full border rounded-lg p-2.5 text-sm">
+        </div>
+        <button type="submit" id="btn-guardar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition">
+          Guardar en Base de Datos
+        </button>
+      </form>
+    </section>
+
+    <!-- Catálogo leído desde Supabase -->
+    <section class="lg:col-span-2">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Catálogo Disponible</h2>
+        <span id="contador" class="text-sm bg-slate-200 px-3 py-1 rounded-full font-medium">Cargando...</span>
+      </div>
+      <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Aquí JavaScript inyectará las tarjetas -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
