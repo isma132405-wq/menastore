@@ -17,6 +17,13 @@ const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 const badgeAdmin = document.getElementById('badge-admin');
 const modalLogin = document.getElementById('modal-login');
 
+// Referencias de Edición y Filtros
+const tituloFormAdmin = document.getElementById('titulo-form-admin');
+const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
+const btnGuardar = document.getElementById('btn-guardar');
+const inputEditId = document.getElementById('edit-id');
+const inputBuscador = document.getElementById('buscador');
+
 // Referencias del Carrito
 const drawerCarrito = document.getElementById('drawer-carrito');
 const listaCarrito = document.getElementById('lista-carrito');
@@ -26,6 +33,8 @@ const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
 
 let esAdmin = false;
 let catalogoCache = [];
+let categoriaActiva = 'Todas';
+let nombreOriginalEditando = null;
 let carrito = JSON.parse(localStorage.getItem('menastore_carrito')) || [];
 
 // 2. Control de interfaz según el estado de sesión
@@ -48,6 +57,7 @@ function actualizarInterfazSesion(usuario) {
     btnCerrarSesion.classList.add('hidden');
     btnAbrirLogin.classList.remove('hidden');
     btnAbrirCarrito.classList.remove('hidden');
+    cancelarEdicion();
 
     layoutPrincipal.className = 'grid grid-cols-1 gap-8';
     seccionCatalogo.className = 'col-span-1';
@@ -99,7 +109,7 @@ async function cerrarSesion() {
   actualizarInterfazSesion(null);
 }
 
-// 4. Leer productos de la base de datos (SELECT)
+// 4. Leer productos y aplicar búsqueda/filtros
 async function cargarProductos() {
   const { data: productos, error } = await supabaseClient
     .from('productos')
@@ -112,21 +122,60 @@ async function cargarProductos() {
   }
 
   catalogoCache = productos;
-  contador.textContent = `${productos.length} artículos`;
+  aplicarFiltros();
+}
+
+function seleccionarCategoria(categoria) {
+  categoriaActiva = categoria;
+
+  document.querySelectorAll('.btn-cat').forEach(btn => {
+    if (btn.dataset.cat === categoria) {
+      btn.className = 'btn-cat bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition';
+    } else {
+      btn.className = 'btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition';
+    }
+  });
+
+  aplicarFiltros();
+}
+
+function aplicarFiltros() {
+  const texto = inputBuscador.value.trim().toLowerCase();
+
+  const filtrados = catalogoCache.filter(prod => {
+    const coincideCategoria = categoriaActiva === 'Todas' || prod.categoria === categoriaActiva;
+    const coincideTexto = prod.nombre.toLowerCase().includes(texto) || prod.categoria.toLowerCase().includes(texto);
+    return coincideCategoria && coincideTexto;
+  });
+
+  renderizarCatalogo(filtrados);
+}
+
+function renderizarCatalogo(listaProductos) {
+  contador.textContent = `${listaProductos.length} artículos`;
   grid.innerHTML = '';
 
-  productos.forEach((prod, index) => {
+  if (listaProductos.length === 0) {
+    grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">No se encontraron productos con ese filtro.</div>`;
+    return;
+  }
+
+  listaProductos.forEach(prod => {
     const imgDefault = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=500&q=60';
     const tarjeta = document.createElement('div');
     tarjeta.className = 'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition';
     
+    const indexReal = catalogoCache.indexOf(prod);
     const sinStock = Number(prod.stock) <= 0;
 
     const accionTarjeta = esAdmin
-      ? `<button onclick="eliminarProducto('${prod.id || prod.nombre}')" class="text-xs text-red-600 hover:underline font-medium">Eliminar</button>`
+      ? `<div class="flex items-center gap-3">
+           <button onclick="prepararEdicion(${indexReal})" class="text-xs text-blue-600 hover:underline font-medium">Editar</button>
+           <button onclick="eliminarProducto('${prod.id || prod.nombre}')" class="text-xs text-red-600 hover:underline font-medium">Eliminar</button>
+         </div>`
       : sinStock
         ? `<span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1.5 rounded-lg font-medium">Agotado</span>`
-        : `<button onclick="agregarAlCarrito(${index})" class="text-xs bg-slate-900 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-semibold transition">Agregar +</button>`;
+        : `<button onclick="agregarAlCarrito(${indexReal})" class="text-xs bg-slate-900 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-semibold transition">Agregar +</button>`;
 
     tarjeta.innerHTML = `
       <div>
@@ -266,14 +315,44 @@ function enviarPedidoWhatsApp() {
   window.open(url, '_blank');
 }
 
-// 6. Guardar producto nuevo (INSERT - protegido por RLS)
+// 6. Crear o Editar Producto (INSERT / UPDATE - protegido por RLS)
+function prepararEdicion(indexProducto) {
+  const prod = catalogoCache[indexProducto];
+  if (!prod) return;
+
+  inputEditId.value = prod.id || '';
+  nombreOriginalEditando = prod.nombre;
+
+  document.getElementById('nombre').value = prod.nombre;
+  document.getElementById('precio').value = prod.precio;
+  document.getElementById('stock').value = prod.stock;
+  document.getElementById('categoria').value = prod.categoria;
+  document.getElementById('imagen').value = prod.imagen || '';
+
+  tituloFormAdmin.textContent = 'Editar Producto';
+  btnGuardar.textContent = 'Actualizar Producto';
+  btnGuardar.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg transition';
+  btnCancelarEdicion.classList.remove('hidden');
+
+  panelAdmin.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelarEdicion() {
+  form.reset();
+  inputEditId.value = '';
+  nombreOriginalEditando = null;
+  tituloFormAdmin.textContent = 'Registrar Nuevo Producto';
+  btnGuardar.textContent = 'Guardar en Base de Datos';
+  btnGuardar.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition';
+  btnCancelarEdicion.classList.add('hidden');
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const btn = document.getElementById('btn-guardar');
-  btn.textContent = 'Guardando...';
-  btn.disabled = true;
+  btnGuardar.textContent = 'Procesando...';
+  btnGuardar.disabled = true;
 
-  const nuevoProducto = {
+  const datosProducto = {
     nombre: document.getElementById('nombre').value,
     precio: parseFloat(document.getElementById('precio').value),
     stock: parseInt(document.getElementById('stock').value),
@@ -281,17 +360,30 @@ form.addEventListener('submit', async (e) => {
     imagen: document.getElementById('imagen').value
   };
 
-  const { error } = await supabaseClient
-    .from('productos')
-    .insert([nuevoProducto]);
+  const editId = inputEditId.value;
+  let errorOperacion = null;
 
-  btn.textContent = 'Guardar en Base de Datos';
-  btn.disabled = false;
+  if (editId || nombreOriginalEditando) {
+    // Modo actualización (UPDATE)
+    const filtro = editId
+      ? supabaseClient.from('productos').update(datosProducto).eq('id', editId)
+      : supabaseClient.from('productos').update(datosProducto).eq('nombre', nombreOriginalEditando);
 
-  if (error) {
-    alert('Error al guardar: ' + error.message);
+    const { error } = await filtro;
+    errorOperacion = error;
   } else {
-    form.reset();
+    // Modo creación (INSERT)
+    const { error } = await supabaseClient.from('productos').insert([datosProducto]);
+    errorOperacion = error;
+  }
+
+  btnGuardar.disabled = false;
+
+  if (errorOperacion) {
+    alert('Error al guardar: ' + errorOperacion.message);
+    btnGuardar.textContent = (editId || nombreOriginalEditando) ? 'Actualizar Producto' : 'Guardar en Base de Datos';
+  } else {
+    cancelarEdicion();
     cargarProductos();
   }
 });

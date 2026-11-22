@@ -13,7 +13,6 @@
   <nav class="bg-slate-900 text-white px-6 py-4 shadow-md flex justify-between items-center sticky top-0 z-40">
     <h1 class="text-2xl font-black tracking-wider text-emerald-400">MENA<span class="text-white">STORE</span></h1>
     <div class="flex items-center gap-3">
-      <!-- Botón Carrito (visible para clientes) -->
       <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="relative text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-2">
         <span>Carrito</span>
         <span id="badge-carrito" class="bg-slate-900 text-emerald-400 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
@@ -40,8 +39,12 @@
       
       <!-- Panel de administración -->
       <section id="panel-admin" class="hidden lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
-        <h2 class="text-lg font-bold mb-4 border-b pb-2 text-slate-900">Registrar Nuevo Producto</h2>
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+          <h2 id="titulo-form-admin" class="text-lg font-bold text-slate-900">Registrar Nuevo Producto</h2>
+          <button type="button" id="btn-cancelar-edicion" onclick="cancelarEdicion()" class="hidden text-xs text-slate-500 hover:text-red-600 underline">Cancelar</button>
+        </div>
         <form id="form-producto" class="space-y-4">
+          <input type="hidden" id="edit-id">
           <div>
             <label class="block text-sm font-medium mb-1">Nombre del artículo</label>
             <input type="text" id="nombre" required placeholder="Ej. Camiseta FC Barcelona" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
@@ -77,10 +80,23 @@
 
       <!-- Catálogo público -->
       <section id="seccion-catalogo" class="col-span-1">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
           <h2 class="text-xl font-bold text-slate-900">Catálogo Disponible</h2>
-          <span id="contador" class="text-sm text-slate-500 bg-slate-200 px-3 py-1 rounded-full font-medium">Cargando...</span>
+          <span id="contador" class="text-sm text-slate-500 bg-slate-200 px-3 py-1 rounded-full font-medium w-fit">Cargando...</span>
         </div>
+
+        <!-- Buscador y Filtros por Categoría -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 space-y-3">
+          <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar camiseta, equipo o artículo..." class="w-full border border-slate-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          <div id="filtros-categoria" class="flex flex-wrap gap-2">
+            <button onclick="seleccionarCategoria('Todas')" data-cat="Todas" class="btn-cat bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Todas</button>
+            <button onclick="seleccionarCategoria('Camisetas')" data-cat="Camisetas" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Camisetas</button>
+            <button onclick="seleccionarCategoria('Calzado')" data-cat="Calzado" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Calzado</button>
+            <button onclick="seleccionarCategoria('Balones')" data-cat="Balones" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Balones</button>
+            <button onclick="seleccionarCategoria('Accesorios')" data-cat="Accesorios" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Accesorios</button>
+          </div>
+        </div>
+
         <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Las tarjetas se inyectan aquí desde app.js -->
         </div>
