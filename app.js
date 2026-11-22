@@ -12,10 +12,13 @@ const contador = document.getElementById('contador');
 const panelAdmin = document.getElementById('panel-admin');
 const layoutPrincipal = document.getElementById('layout-principal');
 const seccionCatalogo = document.getElementById('seccion-catalogo');
+const tituloSeccionCatalogo = document.getElementById('titulo-seccion-catalogo');
+const heroBanner = document.getElementById('hero-banner');
 const btnAbrirLogin = document.getElementById('btn-abrir-login');
 const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 const badgeAdmin = document.getElementById('badge-admin');
 const modalLogin = document.getElementById('modal-login');
+const modalTallas = document.getElementById('modal-tallas');
 
 // Referencias de Edición y Filtros
 const tituloFormAdmin = document.getElementById('titulo-form-admin');
@@ -47,6 +50,7 @@ function actualizarInterfazSesion(usuario) {
     btnCerrarSesion.classList.remove('hidden');
     btnAbrirLogin.classList.add('hidden');
     btnAbrirCarrito.classList.add('hidden');
+    heroBanner.classList.add('hidden');
 
     layoutPrincipal.className = 'grid grid-cols-1 lg:grid-cols-3 gap-8';
     seccionCatalogo.className = 'lg:col-span-2';
@@ -57,18 +61,19 @@ function actualizarInterfazSesion(usuario) {
     btnCerrarSesion.classList.add('hidden');
     btnAbrirLogin.classList.remove('hidden');
     btnAbrirCarrito.classList.remove('hidden');
+    heroBanner.classList.remove('hidden');
     cancelarEdicion();
 
     layoutPrincipal.className = 'grid grid-cols-1 gap-8';
     seccionCatalogo.className = 'col-span-1';
-    grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+    grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6';
   }
 
   cargarProductos();
   renderizarCarrito();
 }
 
-// Funciones del Modal de Login
+// Modales de Login y Guía de Tallas
 function abrirModalLogin() {
   modalLogin.classList.remove('hidden');
 }
@@ -76,6 +81,14 @@ function abrirModalLogin() {
 function cerrarModalLogin() {
   modalLogin.classList.add('hidden');
   formLogin.reset();
+}
+
+function abrirGuiaTallas() {
+  modalTallas.classList.remove('hidden');
+}
+
+function cerrarGuiaTallas() {
+  modalTallas.classList.add('hidden');
 }
 
 // 3. Iniciar y cerrar sesión con Supabase Auth
@@ -127,12 +140,13 @@ async function cargarProductos() {
 
 function seleccionarCategoria(categoria) {
   categoriaActiva = categoria;
+  tituloSeccionCatalogo.textContent = categoria === 'Todas' ? 'Todo el Catálogo' : categoria;
 
   document.querySelectorAll('.btn-cat').forEach(btn => {
     if (btn.dataset.cat === categoria) {
-      btn.className = 'btn-cat bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition';
+      btn.className = 'btn-cat bg-neutral-950 text-white text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap';
     } else {
-      btn.className = 'btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition';
+      btn.className = 'btn-cat bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-900 text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap';
     }
   });
 
@@ -152,42 +166,47 @@ function aplicarFiltros() {
 }
 
 function renderizarCatalogo(listaProductos) {
-  contador.textContent = `${listaProductos.length} artículos`;
+  contador.textContent = `${listaProductos.length} productos`;
   grid.innerHTML = '';
 
   if (listaProductos.length === 0) {
-    grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">No se encontraron productos con ese filtro.</div>`;
+    grid.innerHTML = `<div class="col-span-full text-center py-14 text-neutral-400 text-sm bg-neutral-50 rounded-2xl border border-neutral-200">No se encontraron artículos con ese criterio.</div>`;
     return;
   }
 
   listaProductos.forEach(prod => {
     const imgDefault = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=500&q=60';
-    const tarjeta = document.createElement('div');
-    tarjeta.className = 'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition';
+    const tarjeta = document.createElement('article');
+    tarjeta.className = 'group bg-white rounded-xl border border-neutral-200/80 overflow-hidden flex flex-col justify-between hover:border-neutral-400 transition';
     
     const indexReal = catalogoCache.indexOf(prod);
     const sinStock = Number(prod.stock) <= 0;
 
     const accionTarjeta = esAdmin
       ? `<div class="flex items-center gap-3">
-           <button onclick="prepararEdicion(${indexReal})" class="text-xs text-blue-600 hover:underline font-medium">Editar</button>
-           <button onclick="eliminarProducto('${prod.id || prod.nombre}')" class="text-xs text-red-600 hover:underline font-medium">Eliminar</button>
+           <button onclick="prepararEdicion(${indexReal})" class="text-xs text-blue-600 hover:underline font-bold uppercase">Editar</button>
+           <button onclick="eliminarProducto('${prod.id || prod.nombre}')" class="text-xs text-red-600 hover:underline font-bold uppercase">Eliminar</button>
          </div>`
       : sinStock
-        ? `<span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1.5 rounded-lg font-medium">Agotado</span>`
-        : `<button onclick="agregarAlCarrito(${indexReal})" class="text-xs bg-slate-900 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-semibold transition">Agregar +</button>`;
+        ? `<span class="text-xs text-neutral-400 font-bold uppercase">Agotado</span>`
+        : `<button onclick="agregarAlCarrito(${indexReal})" class="text-xs bg-neutral-950 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-full font-bold uppercase tracking-wider transition">Agregar</button>`;
 
     tarjeta.innerHTML = `
       <div>
-        <img src="${prod.imagen || imgDefault}" alt="${prod.nombre}" class="w-full h-64 object-contain bg-white p-3 border-b border-slate-100">
+        <div class="relative bg-neutral-100 p-4 flex items-center justify-center h-64 overflow-hidden">
+          <span class="absolute top-3 left-3 bg-white/90 text-neutral-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded">
+            ${prod.categoria}
+          </span>
+          <img src="${prod.imagen || imgDefault}" alt="${prod.nombre}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300">
+        </div>
         <div class="p-4">
-          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">${prod.categoria}</span>
-          <h3 class="font-bold text-lg mt-1 text-slate-900">${prod.nombre}</h3>
-          <p class="text-slate-500 text-sm mt-1">Disponibles: ${prod.stock} uds.</p>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-neutral-400">MENASTORE OFFICIAL</p>
+          <h3 class="font-bold text-sm text-neutral-900 mt-1 line-clamp-2 min-h-[2.5rem]">${prod.nombre}</h3>
+          <p class="text-neutral-500 text-xs mt-1.5">Stock disponible: ${prod.stock} uds.</p>
         </div>
       </div>
-      <div class="px-4 pb-4 pt-3 border-t flex justify-between items-center">
-        <span class="text-xl font-black text-slate-900">₡${Number(prod.precio).toLocaleString()}</span>
+      <div class="px-4 pb-4 pt-3 border-t border-neutral-100 flex justify-between items-center">
+        <span class="text-lg font-black text-neutral-950">₡${Number(prod.precio).toLocaleString()}</span>
         ${accionTarjeta}
       </div>
     `;
@@ -265,7 +284,7 @@ function renderizarCarrito() {
   badgeCarrito.textContent = totalUnidades;
 
   if (carrito.length === 0) {
-    listaCarrito.innerHTML = `<p class="text-center text-slate-400 text-sm py-12">Tu carrito está vacío. Agrega artículos del catálogo para empezar.</p>`;
+    listaCarrito.innerHTML = `<p class="text-center text-neutral-400 text-sm py-12">Tu carrito está vacío. Agrega artículos del catálogo para empezar.</p>`;
     totalCarritoEl.textContent = '₡0';
     return;
   }
@@ -281,14 +300,14 @@ function renderizarCarrito() {
     fila.className = 'flex items-center justify-between gap-3 border-b pb-3';
     fila.innerHTML = `
       <div class="flex-grow">
-        <h4 class="font-bold text-sm text-slate-900">${item.nombre}</h4>
-        <p class="text-xs text-slate-500">₡${item.precio.toLocaleString()} c/u</p>
+        <h4 class="font-bold text-sm text-neutral-900">${item.nombre}</h4>
+        <p class="text-xs text-neutral-500">₡${item.precio.toLocaleString()} c/u</p>
         <p class="text-xs font-bold text-emerald-700 mt-0.5">Subtotal: ₡${subtotal.toLocaleString()}</p>
       </div>
-      <div class="flex items-center gap-2 bg-slate-100 rounded-lg px-2 py-1">
-        <button onclick="cambiarCantidad('${item.clave}', -1)" class="w-6 h-6 font-bold text-slate-700 hover:text-red-600">-</button>
+      <div class="flex items-center gap-2 bg-neutral-100 rounded-full px-2.5 py-1">
+        <button onclick="cambiarCantidad('${item.clave}', -1)" class="w-6 h-6 font-bold text-neutral-700 hover:text-red-600">-</button>
         <span class="text-sm font-bold w-5 text-center">${item.cantidad}</span>
-        <button onclick="cambiarCantidad('${item.clave}', 1)" class="w-6 h-6 font-bold text-slate-700 hover:text-emerald-600">+</button>
+        <button onclick="cambiarCantidad('${item.clave}', 1)" class="w-6 h-6 font-bold text-neutral-700 hover:text-emerald-600">+</button>
       </div>
     `;
     listaCarrito.appendChild(fila);
@@ -329,9 +348,9 @@ function prepararEdicion(indexProducto) {
   document.getElementById('categoria').value = prod.categoria;
   document.getElementById('imagen').value = prod.imagen || '';
 
-  tituloFormAdmin.textContent = 'Editar Producto';
-  btnGuardar.textContent = 'Actualizar Producto';
-  btnGuardar.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg transition';
+  tituloFormAdmin.textContent = 'Editar Artículo';
+  btnGuardar.textContent = 'Actualizar Artículo';
+  btnGuardar.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition';
   btnCancelarEdicion.classList.remove('hidden');
 
   panelAdmin.scrollIntoView({ behavior: 'smooth' });
@@ -341,9 +360,9 @@ function cancelarEdicion() {
   form.reset();
   inputEditId.value = '';
   nombreOriginalEditando = null;
-  tituloFormAdmin.textContent = 'Registrar Nuevo Producto';
-  btnGuardar.textContent = 'Guardar en Base de Datos';
-  btnGuardar.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition';
+  tituloFormAdmin.textContent = 'Nuevo Artículo';
+  btnGuardar.textContent = 'Guardar en Catálogo';
+  btnGuardar.className = 'w-full bg-neutral-950 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition';
   btnCancelarEdicion.classList.add('hidden');
 }
 
@@ -364,7 +383,6 @@ form.addEventListener('submit', async (e) => {
   let errorOperacion = null;
 
   if (editId || nombreOriginalEditando) {
-    // Modo actualización (UPDATE)
     const filtro = editId
       ? supabaseClient.from('productos').update(datosProducto).eq('id', editId)
       : supabaseClient.from('productos').update(datosProducto).eq('nombre', nombreOriginalEditando);
@@ -372,7 +390,6 @@ form.addEventListener('submit', async (e) => {
     const { error } = await filtro;
     errorOperacion = error;
   } else {
-    // Modo creación (INSERT)
     const { error } = await supabaseClient.from('productos').insert([datosProducto]);
     errorOperacion = error;
   }
@@ -381,7 +398,7 @@ form.addEventListener('submit', async (e) => {
 
   if (errorOperacion) {
     alert('Error al guardar: ' + errorOperacion.message);
-    btnGuardar.textContent = (editId || nombreOriginalEditando) ? 'Actualizar Producto' : 'Guardar en Base de Datos';
+    btnGuardar.textContent = (editId || nombreOriginalEditando) ? 'Actualizar Artículo' : 'Guardar en Catálogo';
   } else {
     cancelarEdicion();
     cargarProductos();

@@ -3,65 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MENASTORE | Tienda Oficial</title>
+  <title>MENASTORE | Tienda Deportiva Oficial</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-white text-neutral-900 min-h-screen flex flex-col antialiased">
 
-  <!-- Barra de navegación -->
-  <nav class="bg-slate-900 text-white px-6 py-4 shadow-md flex justify-between items-center sticky top-0 z-40">
-    <h1 class="text-2xl font-black tracking-wider text-emerald-400">MENA<span class="text-white">STORE</span></h1>
-    <div class="flex items-center gap-3">
-      <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="relative text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-2">
-        <span>Carrito</span>
-        <span id="badge-carrito" class="bg-slate-900 text-emerald-400 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
-      </button>
-
-      <span id="badge-admin" class="hidden text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold">Modo Admin</span>
-      <button id="btn-abrir-login" onclick="abrirModalLogin()" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-1.5 rounded-lg border border-slate-700 transition">
-        Acceso Admin
-      </button>
-      <button id="btn-cerrar-sesion" onclick="cerrarSesion()" class="hidden text-sm bg-red-600 hover:bg-red-700 text-white px-3.5 py-1.5 rounded-lg font-medium transition">
-        Cerrar Sesión
-      </button>
+  <!-- Barra superior de avisos e información rápida -->
+  <div class="bg-neutral-950 text-neutral-200 text-xs px-4 py-2 border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1">
+      <p class="font-medium tracking-wide text-amber-300">PAGINA EN CONSTRUCCIÓN :) &bull; ENVÍOS A TODO COSTA RICA</p>
+      <div class="flex items-center gap-4 text-neutral-300">
+        <button onclick="abrirGuiaTallas()" class="hover:text-white underline underline-offset-2 transition">Guía de tallas</button>
+        <span>&bull;</span>
+        <button id="btn-abrir-login" onclick="abrirModalLogin()" class="hover:text-emerald-400 transition font-medium">Acceso Admin</button>
+        <span id="badge-admin" class="hidden text-emerald-400 font-bold">Modo Admin Activo</span>
+        <button id="btn-cerrar-sesion" onclick="cerrarSesion()" class="hidden text-red-400 hover:text-red-300 font-semibold transition">Cerrar Sesión</button>
+      </div>
     </div>
-  </nav>
-
-  <!-- Banner de aviso -->
-  <div class="bg-amber-100 border-b border-amber-200 text-amber-900 px-4 py-2 text-center text-xs sm:text-sm font-semibold tracking-wide">
-    PAGINA EN CONSTRUCCIÓN :) &bull; CREADO POR IMENA
   </div>
 
+  <!-- Cabecera principal estilo retail -->
+  <header class="bg-white border-b border-neutral-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <!-- Logo -->
+      <a href="#" onclick="seleccionarCategoria('Todas')" class="text-2xl sm:text-3xl font-black tracking-tighter text-neutral-950">
+        MENA<span class="text-emerald-600">STORE</span>
+      </a>
+
+      <!-- Buscador central -->
+      <div class="order-3 md:order-2 w-full md:w-96 lg:w-[28rem]">
+        <div class="relative">
+          <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar camiseta, equipo o artículo deportivo..." class="w-full bg-neutral-100 border border-neutral-200 focus:bg-white focus:border-neutral-900 rounded-full pl-4 pr-10 py-2 text-sm outline-none transition">
+          <span class="absolute right-3.5 top-2 text-neutral-400 text-sm">&#128269;</span>
+        </div>
+      </div>
+
+      <!-- Carrito -->
+      <div class="order-2 md:order-3 flex items-center gap-3">
+        <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="bg-neutral-950 hover:bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold transition flex items-center gap-2 shadow-sm">
+          <span>Carrito</span>
+          <span id="badge-carrito" class="bg-emerald-500 text-neutral-950 text-xs font-black px-2 py-0.5 rounded-full">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de navegación por categorías -->
+    <nav class="bg-neutral-50 border-t border-neutral-200">
+      <div id="filtros-categoria" class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center gap-2 overflow-x-auto">
+        <button onclick="seleccionarCategoria('Todas')" data-cat="Todas" class="btn-cat bg-neutral-950 text-white text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Todo el catálogo</button>
+        <button onclick="seleccionarCategoria('Camisetas')" data-cat="Camisetas" class="btn-cat bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-900 text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Camisetas</button>
+        <button onclick="seleccionarCategoria('Calzado')" data-cat="Calzado" class="btn-cat bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-900 text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Calzado</button>
+        <button onclick="seleccionarCategoria('Balones')" data-cat="Balones" class="btn-cat bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-900 text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Balones</button>
+        <button onclick="seleccionarCategoria('Accesorios')" data-cat="Accesorios" class="btn-cat bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-900 text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Accesorios</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Banner principal de portada (Hero) -->
+  <section id="hero-banner" class="bg-neutral-900 text-white relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+      <div class="space-y-4 z-10">
+        <span class="inline-block bg-emerald-500 text-neutral-950 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-sm">Nueva Colección 2026</span>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight uppercase">
+          Equipate con los colores de tu pasión
+        </h2>
+        <p class="text-neutral-300 text-sm sm:text-base max-w-md">
+          Camisetas de clubes, selecciones y artículos deportivos seleccionados. Pedidos rápidos con entrega coordinada en todo el país.
+        </p>
+        <div class="pt-2 flex flex-wrap gap-3">
+          <a href="#catalogo-ancla" class="bg-white text-neutral-950 hover:bg-emerald-400 font-black text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
+            Explorar Catálogo
+          </a>
+          <button onclick="abrirGuiaTallas()" class="border border-neutral-600 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-5 py-3.5 rounded-full transition">
+            Ver Guía de Tallas
+          </button>
+        </div>
+      </div>
+      <div class="hidden md:flex justify-end">
+        <div class="bg-neutral-800/80 border border-neutral-700 rounded-2xl p-6 max-w-sm text-right space-y-2">
+          <p class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Compra Segura</p>
+          <p class="text-xl font-black">SINPE Móvil &bull; Transferencia</p>
+          <p class="text-xs text-neutral-400">Coordinación directa por WhatsApp para confirmar talla, disponibilidad y envío.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Contenedor principal -->
-  <main class="max-w-6xl mx-auto p-6 w-full flex-grow">
+  <main id="catalogo-ancla" class="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full flex-grow">
     <div id="layout-principal" class="grid grid-cols-1 gap-8">
       
-      <!-- Panel de administración -->
-      <section id="panel-admin" class="hidden lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
-        <div class="flex justify-between items-center mb-4 border-b pb-2">
-          <h2 id="titulo-form-admin" class="text-lg font-bold text-slate-900">Registrar Nuevo Producto</h2>
-          <button type="button" id="btn-cancelar-edicion" onclick="cancelarEdicion()" class="hidden text-xs text-slate-500 hover:text-red-600 underline">Cancelar</button>
+      <!-- Panel de administración (Oculto para clientes) -->
+      <section id="panel-admin" class="hidden lg:col-span-1 bg-neutral-50 p-6 rounded-2xl border border-neutral-200 h-fit">
+        <div class="flex justify-between items-center mb-4 border-b border-neutral-200 pb-3">
+          <h2 id="titulo-form-admin" class="text-base font-black uppercase tracking-wide text-neutral-900">Nuevo Artículo</h2>
+          <button type="button" id="btn-cancelar-edicion" onclick="cancelarEdicion()" class="hidden text-xs text-red-600 hover:underline font-semibold">Cancelar</button>
         </div>
         <form id="form-producto" class="space-y-4">
           <input type="hidden" id="edit-id">
           <div>
-            <label class="block text-sm font-medium mb-1">Nombre del artículo</label>
-            <input type="text" id="nombre" required placeholder="Ej. Camiseta FC Barcelona" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Nombre del artículo</label>
+            <input type="text" id="nombre" required placeholder="Ej. Camiseta FC Barcelona" class="w-full bg-white border border-neutral-300 rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm font-medium mb-1">Precio (₡)</label>
-              <input type="number" id="precio" required placeholder="25000" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+              <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Precio (₡)</label>
+              <input type="number" id="precio" required placeholder="25000" class="w-full bg-white border border-neutral-300 rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Stock</label>
-              <input type="number" id="stock" required placeholder="10" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+              <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Stock</label>
+              <input type="number" id="stock" required placeholder="10" class="w-full bg-white border border-neutral-300 rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Categoría</label>
-            <select id="categoria" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Categoría</label>
+            <select id="categoria" class="w-full bg-white border border-neutral-300 rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
               <option value="Camisetas">Camisetas</option>
               <option value="Calzado">Calzado</option>
               <option value="Balones">Balones</option>
@@ -69,35 +126,26 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">URL de la imagen</label>
-            <input type="url" id="imagen" placeholder="https://..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">URL de la imagen</label>
+            <input type="url" id="imagen" placeholder="https://..." class="w-full bg-white border border-neutral-300 rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
           </div>
-          <button type="submit" id="btn-guardar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition">
-            Guardar en Base de Datos
+          <button type="submit" id="btn-guardar" class="w-full bg-neutral-950 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition">
+            Guardar en Catálogo
           </button>
         </form>
       </section>
 
       <!-- Catálogo público -->
       <section id="seccion-catalogo" class="col-span-1">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-          <h2 class="text-xl font-bold text-slate-900">Catálogo Disponible</h2>
-          <span id="contador" class="text-sm text-slate-500 bg-slate-200 px-3 py-1 rounded-full font-medium w-fit">Cargando...</span>
-        </div>
-
-        <!-- Buscador y Filtros por Categoría -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 space-y-3">
-          <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar camiseta, equipo o artículo..." class="w-full border border-slate-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-          <div id="filtros-categoria" class="flex flex-wrap gap-2">
-            <button onclick="seleccionarCategoria('Todas')" data-cat="Todas" class="btn-cat bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Todas</button>
-            <button onclick="seleccionarCategoria('Camisetas')" data-cat="Camisetas" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Camisetas</button>
-            <button onclick="seleccionarCategoria('Calzado')" data-cat="Calzado" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Calzado</button>
-            <button onclick="seleccionarCategoria('Balones')" data-cat="Balones" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Balones</button>
-            <button onclick="seleccionarCategoria('Accesorios')" data-cat="Accesorios" class="btn-cat bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition">Accesorios</button>
+        <div class="flex justify-between items-end mb-6 border-b border-neutral-200 pb-3">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-emerald-600">Vitrina Oficial</p>
+            <h2 id="titulo-seccion-catalogo" class="text-2xl font-black uppercase tracking-tight text-neutral-950">Todo el Catálogo</h2>
           </div>
+          <span id="contador" class="text-xs font-bold uppercase tracking-wider text-neutral-500">Cargando...</span>
         </div>
 
-        <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Las tarjetas se inyectan aquí desde app.js -->
         </div>
       </section>
@@ -105,32 +153,87 @@
     </div>
   </main>
 
-  <!-- Pie de página -->
-  <footer class="bg-slate-900 text-slate-400 text-center py-4 text-xs tracking-wider border-t border-slate-800 mt-10">
-    PAGINA EN CONSTRUCCIÓN :) &mdash; CREADO POR <span class="text-emerald-400 font-bold">IMENA</span>
+  <!-- Pie de página comercial -->
+  <footer class="bg-neutral-950 text-neutral-300 border-t border-neutral-800 mt-16">
+    <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
+      <div>
+        <h3 class="text-xl font-black tracking-tighter text-white mb-3">MENA<span class="text-emerald-500">STORE</span></h3>
+        <p class="text-neutral-400 text-xs leading-relaxed">
+          Tienda deportiva en Costa Rica. Camisetas oficiales, indumentaria y accesorios para entrenar y apoyar a tu equipo.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-3">Categorías</h4>
+        <ul class="space-y-2 text-xs text-neutral-400">
+          <li><button onclick="seleccionarCategoria('Camisetas')" class="hover:text-white transition">Camisetas de Fútbol</button></li>
+          <li><button onclick="seleccionarCategoria('Calzado')" class="hover:text-white transition">Calzado Deportivo</button></li>
+          <li><button onclick="seleccionarCategoria('Balones')" class="hover:text-white transition">Balones</button></li>
+          <li><button onclick="seleccionarCategoria('Accesorios')" class="hover:text-white transition">Accesorios</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-3">Ayuda al Cliente</h4>
+        <ul class="space-y-2 text-xs text-neutral-400">
+          <li><button onclick="abrirGuiaTallas()" class="hover:text-white transition">Guía de Tallas</button></li>
+          <li><span>Pagos: SINPE Móvil / Transferencia</span></li>
+          <li><span>Envíos por Correos de Costa Rica / Mensajería</span></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-3">Estado del Sitio</h4>
+        <p class="text-xs text-amber-300 font-semibold mb-2">PAGINA EN CONSTRUCCIÓN :)</p>
+        <p class="text-xs text-neutral-400">Desarrollado por <span class="text-emerald-400 font-bold">IMENA</span></p>
+      </div>
+    </div>
   </footer>
 
+  <!-- Modal Guía de Tallas -->
+  <div id="modal-tallas" class="hidden fixed inset-0 bg-neutral-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-neutral-200">
+      <div class="flex justify-between items-center mb-4 border-b pb-3">
+        <h3 class="text-lg font-black uppercase tracking-tight text-neutral-900">Guía de Tallas (Camisetas)</h3>
+        <button onclick="cerrarGuiaTallas()" class="text-neutral-400 hover:text-neutral-900 font-bold text-xl">&times;</button>
+      </div>
+      <p class="text-xs text-neutral-500 mb-4">Medidas aproximadas en centímetros (versión aficionado / corte regular):</p>
+      <table class="w-full text-xs text-left border border-neutral-200">
+        <thead class="bg-neutral-100 text-neutral-900 font-bold uppercase">
+          <tr>
+            <th class="p-2.5 border-b">Talla</th>
+            <th class="p-2.5 border-b">Pecho (cm)</th>
+            <th class="p-2.5 border-b">Largo (cm)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-neutral-200">
+          <tr><td class="p-2.5 font-bold">S</td><td class="p-2.5">49 - 51 cm</td><td class="p-2.5">69 - 71 cm</td></tr>
+          <tr><td class="p-2.5 font-bold">M</td><td class="p-2.5">52 - 54 cm</td><td class="p-2.5">72 - 74 cm</td></tr>
+          <tr><td class="p-2.5 font-bold">L</td><td class="p-2.5">55 - 57 cm</td><td class="p-2.5">75 - 77 cm</td></tr>
+          <tr><td class="p-2.5 font-bold">XL</td><td class="p-2.5">58 - 60 cm</td><td class="p-2.5">78 - 80 cm</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Drawer lateral del Carrito de Compras -->
-  <div id="drawer-carrito" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-end">
+  <div id="drawer-carrito" class="hidden fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex justify-end">
     <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between">
-      <div class="p-5 border-b flex justify-between items-center bg-slate-900 text-white">
-        <h3 class="text-lg font-bold">Tu Carrito de Compras</h3>
-        <button onclick="cerrarCarrito()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      <div class="p-5 border-b flex justify-between items-center bg-neutral-950 text-white">
+        <h3 class="text-base font-black uppercase tracking-wider">Tu Carrito</h3>
+        <button onclick="cerrarCarrito()" class="text-neutral-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
       <div id="lista-carrito" class="p-5 flex-grow overflow-y-auto space-y-4">
         <!-- Items del carrito -->
       </div>
 
-      <div class="p-5 border-t bg-slate-50 space-y-3">
-        <div class="flex justify-between items-center text-lg font-black text-slate-900">
+      <div class="p-5 border-t bg-neutral-50 space-y-3">
+        <div class="flex justify-between items-center text-lg font-black text-neutral-950">
           <span>Total estimado:</span>
           <span id="total-carrito">₡0</span>
         </div>
-        <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-sm">
+        <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm">
           Confirmar Pedido por WhatsApp
         </button>
-        <button onclick="vaciarCarrito()" class="w-full text-xs text-slate-500 hover:text-red-600 py-1 transition">
+        <button onclick="vaciarCarrito()" class="w-full text-xs text-neutral-500 hover:text-red-600 py-1 transition">
           Vaciar carrito
         </button>
       </div>
@@ -138,22 +241,22 @@
   </div>
 
   <!-- Modal flotante de inicio de sesión -->
-  <div id="modal-login" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-slate-200">
+  <div id="modal-login" class="hidden fixed inset-0 bg-neutral-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-neutral-200">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-slate-900">Panel Administrativo</h3>
-        <button onclick="cerrarModalLogin()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+        <h3 class="text-lg font-black uppercase tracking-tight text-neutral-900">Panel Administrativo</h3>
+        <button onclick="cerrarModalLogin()" class="text-neutral-400 hover:text-neutral-600 font-bold text-lg">&times;</button>
       </div>
       <form id="form-login" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">Correo electrónico</label>
-          <input type="email" id="login-email" required placeholder="admin@menastore.com" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Correo electrónico</label>
+          <input type="email" id="login-email" required placeholder="admin@menastore.com" class="w-full border rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1">Contraseña</label>
-          <input type="password" id="login-password" required placeholder="••••••••" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full border rounded-lg p-2.5 text-sm focus:border-neutral-900 outline-none">
         </div>
-        <button type="submit" id="btn-submit-login" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg transition">
+        <button type="submit" id="btn-submit-login" class="w-full bg-neutral-950 hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition">
           Iniciar Sesión
         </button>
       </form>
