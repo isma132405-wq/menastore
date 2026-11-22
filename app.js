@@ -1,7 +1,7 @@
 // 1. Conexión a Supabase y configuración de tienda
 const SUPABASE_URL = 'https://hxpcucivvggfcnarwuku.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_kHoFrLbY_xMcH8XILfSkhw_LfDXMUtQ';
-const TELEFONO_WHATSAPP = '50684316789'; // Cambia por tu número real con código 506
+const SUPABASE_KEY = 'PEGA_AQUI_TU_LLAVE_EXACTA_DE_SUPABASE';
+const TELEFONO_WHATSAPP = '50688888888'; // Cambia por tu número real con código 506
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Referencias del DOM
@@ -21,6 +21,14 @@ const modalLogin = document.getElementById('modal-login');
 const modalTallas = document.getElementById('modal-tallas');
 const modalDetalle = document.getElementById('modal-detalle');
 
+// Referencias de Pestañas Admin e Historial de Pedidos
+const tabsAdmin = document.getElementById('tabs-admin');
+const vistaPedidos = document.getElementById('vista-pedidos');
+const listaPedidosAdmin = document.getElementById('lista-pedidos-admin');
+const badgePedidosPendientes = document.getElementById('badge-pedidos-pendientes');
+const tabBtnInventario = document.getElementById('tab-btn-inventario');
+const tabBtnPedidos = document.getElementById('tab-btn-pedidos');
+
 // Referencias de Edición y Filtros
 const tituloFormAdmin = document.getElementById('titulo-form-admin');
 const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
@@ -37,6 +45,7 @@ const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
 
 let esAdmin = false;
 let catalogoCache = [];
+let pedidosCache = [];
 let categoriaActiva = 'Todas';
 let nombreOriginalEditando = null;
 let productoDetalleActual = null;
@@ -48,6 +57,7 @@ function actualizarInterfazSesion(usuario) {
   esAdmin = Boolean(usuario);
 
   if (esAdmin) {
+    tabsAdmin.classList.remove('hidden');
     panelAdmin.classList.remove('hidden');
     badgeAdmin.classList.remove('hidden');
     btnCerrarSesion.classList.remove('hidden');
@@ -55,10 +65,12 @@ function actualizarInterfazSesion(usuario) {
     btnAbrirCarrito.classList.add('hidden');
     heroBanner.classList.add('hidden');
 
-    layoutPrincipal.className = 'grid grid-cols-1 lg:grid-cols-3 gap-8';
-    seccionCatalogo.className = 'lg:col-span-2';
-    grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-6';
+    cambiarVistaAdmin('inventario');
+    cargarPedidos();
   } else {
+    tabsAdmin.classList.add('hidden');
+    vistaPedidos.classList.add('hidden');
+    layoutPrincipal.classList.remove('hidden');
     panelAdmin.classList.add('hidden');
     badgeAdmin.classList.add('hidden');
     btnCerrarSesion.classList.add('hidden');
@@ -74,6 +86,24 @@ function actualizarInterfazSesion(usuario) {
 
   cargarProductos();
   renderizarCarrito();
+}
+
+function cambiarVistaAdmin(vista) {
+  if (vista === 'pedidos') {
+    layoutPrincipal.classList.add('hidden');
+    vistaPedidos.classList.remove('hidden');
+    tabBtnPedidos.className = 'bg-neutral-950 text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2';
+    tabBtnInventario.className = 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition';
+    cargarPedidos();
+  } else {
+    vistaPedidos.classList.add('hidden');
+    layoutPrincipal.classList.remove('hidden');
+    layoutPrincipal.className = 'grid grid-cols-1 lg:grid-cols-3 gap-8';
+    seccionCatalogo.className = 'lg:col-span-2';
+    grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-6';
+    tabBtnInventario.className = 'bg-neutral-950 text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition';
+    tabBtnPedidos.className = 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2';
+  }
 }
 
 // Modales de Login y Guía de Tallas
@@ -285,7 +315,7 @@ function confirmarAgregarDesdeDetalle() {
   cerrarModalDetalle();
 }
 
-// 6. Lógica del Carrito de Compras
+// 6. Lógica del Carrito de Compras y Registro de Pedido en Supabase
 function guardarCarritoLocal() {
   localStorage.setItem('menastore_carrito', JSON.stringify(carrito));
   renderizarCarrito();
@@ -319,6 +349,7 @@ function agregarAlCarritoConTalla(prod, talla) {
     carrito.push({
       clave,
       baseId,
+      productoId: prod.id || null,
       nombre: prod.nombre,
       talla,
       precio: Number(prod.precio),
@@ -397,11 +428,18 @@ function renderizarCarrito() {
   totalCarritoEl.textContent = `₡${totalColones.toLocaleString()}`;
 }
 
-function enviarPedidoWhatsApp() {
+async function enviarPedidoWhatsApp() {
   if (carrito.length === 0) {
     alert('Agrega al menos un producto al carrito antes de confirmar.');
     return;
   }
+
+  const btnWa = document.getElementById('btn-confirmar-wa');
+  btnWa.textContent = 'Registrando pedido...';
+  btnWa.disabled = true;
+
+  const clienteNombre = document.getElementById('cliente-nombre').value.trim() || 'Cliente Web';
+  const clienteTelefono = document.getElementById('cliente-telefono').value.trim() || 'No indicado';
 
   let total = 0;
   let lineas = carrito.map(item => {
@@ -411,12 +449,176 @@ function enviarPedidoWhatsApp() {
     return `• ${item.cantidad}x ${item.nombre}${etiquetaTalla} — ₡${sub.toLocaleString()}`;
   });
 
-  const mensaje = `Hola MENASTORE, me gustaría realizar el siguiente pedido:\n\n${lineas.join('\n')}\n\n*Total: ₡${total.toLocaleString()}*`;
+  // Guardar pedido en Supabase antes de abrir WhatsApp
+  const { data: pedidoCreado, error } = await supabaseClient
+    .from('pedidos')
+    .insert([{
+      cliente_nombre: clienteNombre,
+      cliente_telefono: clienteTelefono,
+      detalle: carrito,
+      total: total,
+      estado: 'Pendiente'
+    }])
+    .select()
+    .single();
+
+  btnWa.textContent = 'Confirmar Pedido por WhatsApp';
+  btnWa.disabled = false;
+
+  if (error) {
+    console.error('No se pudo guardar en tabla pedidos:', error);
+  }
+
+  const numeroOrden = pedidoCreado ? ` #${pedidoCreado.id}` : '';
+  const mensaje = `Hola MENASTORE, me gustaría realizar el pedido${numeroOrden}:\n\n${lineas.join('\n')}\n\n*Total: ₡${total.toLocaleString()}*`;
   const url = `https://wa.me/${TELEFONO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+
+  // Limpiar carrito del cliente tras registrar la orden
+  carrito = [];
+  guardarCarritoLocal();
+  cerrarCarrito();
   window.open(url, '_blank');
 }
 
-// 7. Crear o Editar Producto (INSERT / UPDATE - protegido por RLS)
+// 7. Gestión de Historial de Pedidos y Descuento Automático de Stock (Admin)
+async function cargarPedidos() {
+  const { data: pedidos, error } = await supabaseClient
+    .from('pedidos')
+    .select('*')
+    .order('fecha', { ascending: false });
+
+  if (error) {
+    console.error('Error al cargar pedidos:', error);
+    listaPedidosAdmin.innerHTML = `<p class="text-sm text-red-600">Error al cargar historial de pedidos.</p>`;
+    return;
+  }
+
+  pedidosCache = pedidos;
+  const pendientes = pedidos.filter(p => p.estado === 'Pendiente').length;
+  badgePedidosPendientes.textContent = pendientes;
+
+  if (pedidos.length === 0) {
+    listaPedidosAdmin.innerHTML = `<div class="text-center py-12 bg-neutral-50 rounded-2xl border border-neutral-200 text-neutral-400 text-sm">Aún no se han recibido pedidos desde la tienda.</div>`;
+    return;
+  }
+
+  listaPedidosAdmin.innerHTML = pedidos.map(pedido => {
+    const fechaFormateada = new Date(pedido.fecha).toLocaleString('es-CR', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    const esPendiente = pedido.estado === 'Pendiente';
+    const badgeEstado = esPendiente
+      ? `<span class="bg-amber-100 text-amber-800 text-[11px] font-black uppercase px-2.5 py-1 rounded-full">Pendiente</span>`
+      : pedido.estado === 'Completado'
+        ? `<span class="bg-emerald-100 text-emerald-800 text-[11px] font-black uppercase px-2.5 py-1 rounded-full">Completado (Stock descontado)</span>`
+        : `<span class="bg-red-100 text-red-700 text-[11px] font-black uppercase px-2.5 py-1 rounded-full">Cancelado</span>`;
+
+    const itemsHtml = (pedido.detalle || []).map(item => `
+      <li class="text-xs text-neutral-700 flex justify-between py-1 border-b border-neutral-100 last:border-0">
+        <span><strong>${item.cantidad}x</strong> ${item.nombre} <span class="text-neutral-400">(Talla: ${item.talla || 'Única'})</span></span>
+        <span class="font-bold">₡${(item.precio * item.cantidad).toLocaleString()}</span>
+      </li>
+    `).join('');
+
+    const accionesPedido = esPendiente
+      ? `<div class="flex flex-wrap gap-2 pt-3">
+           <button onclick="aprobarYDescontarStock(${pedido.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition">
+             Completar y Descontar Stock
+           </button>
+           <button onclick="cambiarEstadoPedido(${pedido.id}, 'Cancelado')" class="bg-white border border-neutral-300 hover:border-red-600 text-neutral-600 hover:text-red-600 text-xs font-bold uppercase px-3 py-2 rounded-lg transition">
+             Cancelar
+           </button>
+         </div>`
+      : `<div class="pt-2 flex justify-end">
+           <button onclick="eliminarPedido(${pedido.id})" class="text-xs text-neutral-400 hover:text-red-600 underline">Eliminar registro</button>
+         </div>`;
+
+    return `
+      <div class="bg-white rounded-2xl border border-neutral-200 p-5 shadow-sm space-y-3">
+        <div class="flex flex-wrap justify-between items-start gap-2 border-b border-neutral-100 pb-3">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-base font-black text-neutral-950">Orden #${pedido.id}</span>
+              ${badgeEstado}
+            </div>
+            <p class="text-xs text-neutral-500 mt-1">
+              <strong>Cliente:</strong> ${pedido.cliente_nombre} &bull; <strong>Tel:</strong> ${pedido.cliente_telefono} &bull; ${fechaFormateada}
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-bold">Total Pedido</p>
+            <p class="text-xl font-black text-neutral-950">₡${Number(pedido.total).toLocaleString()}</p>
+          </div>
+        </div>
+        <ul class="bg-neutral-50 rounded-xl p-3">${itemsHtml}</ul>
+        ${accionesPedido}
+      </div>
+    `;
+  }).join('');
+}
+
+async function aprobarYDescontarStock(pedidoId) {
+  const pedido = pedidosCache.find(p => p.id === pedidoId);
+  if (!pedido) return;
+
+  if (!confirm(`¿Confirmar venta de la Orden #${pedidoId} y descontar los artículos del inventario?`)) return;
+
+  // Descontar cada artículo vendido en la tabla productos
+  for (const item of pedido.detalle) {
+    const prodEnCatalogo = catalogoCache.find(p => (item.productoId && p.id === item.productoId) || p.nombre === item.nombre);
+    if (prodEnCatalogo) {
+      const nuevoStock = Math.max(0, Number(prodEnCatalogo.stock) - Number(item.cantidad));
+      const query = prodEnCatalogo.id
+        ? supabaseClient.from('productos').update({ stock: nuevoStock }).eq('id', prodEnCatalogo.id)
+        : supabaseClient.from('productos').update({ stock: nuevoStock }).eq('nombre', prodEnCatalogo.nombre);
+      await query;
+    }
+  }
+
+  // Marcar orden como Completada
+  const { error } = await supabaseClient
+    .from('pedidos')
+    .update({ estado: 'Completado' })
+    .eq('id', pedidoId);
+
+  if (error) {
+    alert('Error al actualizar pedido: ' + error.message);
+    return;
+  }
+
+  await cargarProductos();
+  await cargarPedidos();
+}
+
+async function cambiarEstadoPedido(pedidoId, nuevoEstado) {
+  const { error } = await supabaseClient
+    .from('pedidos')
+    .update({ estado: nuevoEstado })
+    .eq('id', pedidoId);
+
+  if (error) {
+    alert('Error al actualizar estado: ' + error.message);
+    return;
+  }
+  cargarPedidos();
+}
+
+async function eliminarPedido(pedidoId) {
+  if (!confirm('¿Eliminar este registro del historial?')) return;
+  const { error } = await supabaseClient
+    .from('pedidos')
+    .delete()
+    .eq('id', pedidoId);
+
+  if (error) {
+    alert('Error al eliminar: ' + error.message);
+    return;
+  }
+  cargarPedidos();
+}
+
+// 8. Crear o Editar Producto (INSERT / UPDATE - protegido por RLS)
 function prepararEdicion(indexProducto) {
   const prod = catalogoCache[indexProducto];
   if (!prod) return;
@@ -487,7 +689,7 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// 8. Eliminar producto (DELETE - protegido por RLS)
+// 9. Eliminar producto (DELETE - protegido por RLS)
 async function eliminarProducto(identificador) {
   if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
 
@@ -510,7 +712,7 @@ async function eliminarProducto(identificador) {
   cargarProductos();
 }
 
-// 9. Verificar sesión al iniciar
+// 10. Verificar sesión al iniciar
 async function iniciarApp() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   actualizarInterfazSesion(session ? session.user : null);

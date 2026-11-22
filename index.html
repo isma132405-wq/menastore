@@ -91,6 +91,19 @@
 
   <!-- Contenedor principal -->
   <main id="catalogo-ancla" class="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full flex-grow">
+    
+    <!-- Navegación exclusiva del Administrador (Inventario vs Pedidos) -->
+    <div id="tabs-admin" class="hidden mb-8 flex gap-3 border-b border-neutral-200 pb-4">
+      <button onclick="cambiarVistaAdmin('inventario')" id="tab-btn-inventario" class="bg-neutral-950 text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition">
+        Gestión de Inventario
+      </button>
+      <button onclick="cambiarVistaAdmin('pedidos')" id="tab-btn-pedidos" class="bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2">
+        <span>Historial de Pedidos</span>
+        <span id="badge-pedidos-pendientes" class="bg-amber-400 text-neutral-950 text-[11px] font-black px-2 py-0.5 rounded-full">0</span>
+      </button>
+    </div>
+
+    <!-- Vista 1: Inventario y Catálogo -->
     <div id="layout-principal" class="grid grid-cols-1 gap-8">
       
       <!-- Panel de administración -->
@@ -148,8 +161,23 @@
           <!-- Las tarjetas se inyectan aquí desde app.js -->
         </div>
       </section>
-
     </div>
+
+    <!-- Vista 2: Historial de Pedidos (Solo visible en modo Admin al cambiar pestaña) -->
+    <section id="vista-pedidos" class="hidden space-y-6">
+      <div class="flex justify-between items-end border-b border-neutral-200 pb-3">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-emerald-600">Control de Ventas</p>
+          <h2 class="text-2xl font-black uppercase tracking-tight text-neutral-950">Pedidos Recibidos</h2>
+        </div>
+        <button onclick="cargarPedidos()" class="text-xs font-bold uppercase tracking-wider bg-neutral-100 hover:bg-neutral-200 px-3.5 py-2 rounded-lg transition">Actualizar Lista</button>
+      </div>
+
+      <div id="lista-pedidos-admin" class="space-y-4">
+        <!-- Los pedidos de Supabase se inyectan aquí -->
+      </div>
+    </section>
+
   </main>
 
   <!-- Pie de página comercial -->
@@ -208,9 +236,7 @@
               <label class="text-xs font-bold uppercase tracking-wider text-neutral-700">Selecciona tu talla:</label>
               <button type="button" onclick="abrirGuiaTallas()" class="text-[11px] text-emerald-700 hover:underline font-semibold">Ver medidas</button>
             </div>
-            <div id="opciones-talla" class="flex flex-wrap gap-2">
-              <!-- Botones de talla se generan desde app.js -->
-            </div>
+            <div id="opciones-talla" class="flex flex-wrap gap-2"></div>
           </div>
         </div>
 
@@ -260,11 +286,17 @@
       </div>
 
       <div class="p-5 border-t bg-neutral-50 space-y-3">
-        <div class="flex justify-between items-center text-lg font-black text-neutral-950">
+        <!-- Datos rápidos del cliente para registrar la orden -->
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="cliente-nombre" placeholder="Tu nombre (opcional)" class="bg-white border border-neutral-300 rounded-lg px-3 py-2 text-xs outline-none focus:border-neutral-950">
+          <input type="tel" id="cliente-telefono" placeholder="Tu teléfono (opcional)" class="bg-white border border-neutral-300 rounded-lg px-3 py-2 text-xs outline-none focus:border-neutral-950">
+        </div>
+
+        <div class="flex justify-between items-center text-lg font-black text-neutral-950 pt-1">
           <span>Total estimado:</span>
           <span id="total-carrito">₡0</span>
         </div>
-        <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm">
+        <button id="btn-confirmar-wa" onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm">
           Confirmar Pedido por WhatsApp
         </button>
         <button onclick="vaciarCarrito()" class="w-full text-xs text-neutral-500 hover:text-red-600 py-1 transition">
