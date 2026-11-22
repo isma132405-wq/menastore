@@ -26,12 +26,10 @@
   <!-- Cabecera principal estilo retail -->
   <header class="bg-white border-b border-neutral-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-      <!-- Logo -->
       <a href="#" onclick="seleccionarCategoria('Todas')" class="text-2xl sm:text-3xl font-black tracking-tighter text-neutral-950">
         MENA<span class="text-emerald-600">STORE</span>
       </a>
 
-      <!-- Buscador central -->
       <div class="order-3 md:order-2 w-full md:w-96 lg:w-[28rem]">
         <div class="relative">
           <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar camiseta, equipo o artículo deportivo..." class="w-full bg-neutral-100 border border-neutral-200 focus:bg-white focus:border-neutral-900 rounded-full pl-4 pr-10 py-2 text-sm outline-none transition">
@@ -39,7 +37,6 @@
         </div>
       </div>
 
-      <!-- Carrito -->
       <div class="order-2 md:order-3 flex items-center gap-3">
         <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="bg-neutral-950 hover:bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold transition flex items-center gap-2 shadow-sm">
           <span>Carrito</span>
@@ -60,11 +57,9 @@
     </nav>
   </header>
 
-  <!-- Banner principal de portada (Hero) con texto más compacto e imagen deportiva -->
+  <!-- Banner principal de portada (Hero) -->
   <section id="hero-banner" class="bg-neutral-900 text-white relative overflow-hidden">
     <div class="max-w-7xl mx-auto px-6 py-10 sm:py-12 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
-      
-      <!-- Columna izquierda: Texto más compacto -->
       <div class="md:col-span-6 space-y-3.5 z-10">
         <span class="inline-block bg-emerald-500 text-neutral-950 text-[11px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm">Nueva Colección 2026</span>
         <h2 class="text-2xl sm:text-4xl font-black tracking-tight leading-snug uppercase">
@@ -83,16 +78,14 @@
         </div>
       </div>
 
-      <!-- Columna derecha: Imagen deportiva estilo campaña -->
       <div class="md:col-span-6 relative h-56 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border border-neutral-800">
         <img 
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToqS8e8B-8F6tflhaLCe9HAT3StNXlZnBFYU-XMQqhYJO8VIJdoJ4UFFc&s=10" 
+          src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80" 
           alt="Colección deportiva MENASTORE" 
           class="w-full h-full object-cover object-center"
         >
         <div class="absolute inset-0 bg-gradient-to-r from-neutral-900/50 via-transparent to-transparent"></div>
       </div>
-
     </div>
   </section>
 
@@ -100,7 +93,7 @@
   <main id="catalogo-ancla" class="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full flex-grow">
     <div id="layout-principal" class="grid grid-cols-1 gap-8">
       
-      <!-- Panel de administración (Oculto para clientes) -->
+      <!-- Panel de administración -->
       <section id="panel-admin" class="hidden lg:col-span-1 bg-neutral-50 p-6 rounded-2xl border border-neutral-200 h-fit">
         <div class="flex justify-between items-center mb-4 border-b border-neutral-200 pb-3">
           <h2 id="titulo-form-admin" class="text-base font-black uppercase tracking-wide text-neutral-900">Nuevo Artículo</h2>
@@ -192,6 +185,41 @@
       </div>
     </div>
   </footer>
+
+  <!-- Modal Vista Rápida y Selector de Talla -->
+  <div id="modal-detalle" class="hidden fixed inset-0 bg-neutral-950/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-neutral-200 grid grid-cols-1 md:grid-cols-2">
+      <div class="bg-neutral-100 p-6 flex items-center justify-center h-72 md:h-auto">
+        <img id="detalle-imagen" src="" alt="" class="max-h-72 w-full object-contain">
+      </div>
+      <div class="p-6 flex flex-col justify-between space-y-5">
+        <div>
+          <div class="flex justify-between items-start gap-2">
+            <span id="detalle-categoria" class="text-[11px] font-black uppercase tracking-widest text-emerald-600"></span>
+            <button onclick="cerrarModalDetalle()" class="text-neutral-400 hover:text-neutral-900 font-bold text-2xl leading-none">&times;</button>
+          </div>
+          <h3 id="detalle-nombre" class="text-xl font-black text-neutral-950 mt-1"></h3>
+          <p id="detalle-precio" class="text-2xl font-black text-neutral-900 mt-2"></p>
+          <p id="detalle-stock" class="text-xs text-neutral-500 mt-1"></p>
+
+          <!-- Selector de Talla -->
+          <div id="bloque-selector-talla" class="mt-5">
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-neutral-700">Selecciona tu talla:</label>
+              <button type="button" onclick="abrirGuiaTallas()" class="text-[11px] text-emerald-700 hover:underline font-semibold">Ver medidas</button>
+            </div>
+            <div id="opciones-talla" class="flex flex-wrap gap-2">
+              <!-- Botones de talla se generan desde app.js -->
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-confirmar-detalle" onclick="confirmarAgregarDesdeDetalle()" class="w-full bg-neutral-950 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition">
+          Añadir al Carrito
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Guía de Tallas -->
   <div id="modal-tallas" class="hidden fixed inset-0 bg-neutral-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">

@@ -19,6 +19,7 @@ const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 const badgeAdmin = document.getElementById('badge-admin');
 const modalLogin = document.getElementById('modal-login');
 const modalTallas = document.getElementById('modal-tallas');
+const modalDetalle = document.getElementById('modal-detalle');
 
 // Referencias de Edición y Filtros
 const tituloFormAdmin = document.getElementById('titulo-form-admin');
@@ -38,6 +39,8 @@ let esAdmin = false;
 let catalogoCache = [];
 let categoriaActiva = 'Todas';
 let nombreOriginalEditando = null;
+let productoDetalleActual = null;
+let tallaSeleccionada = 'M';
 let carrito = JSON.parse(localStorage.getItem('menastore_carrito')) || [];
 
 // 2. Control de interfaz según el estado de sesión
@@ -189,11 +192,11 @@ function renderizarCatalogo(listaProductos) {
          </div>`
       : sinStock
         ? `<span class="text-xs text-neutral-400 font-bold uppercase">Agotado</span>`
-        : `<button onclick="agregarAlCarrito(${indexReal})" class="text-xs bg-neutral-950 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-full font-bold uppercase tracking-wider transition">Agregar</button>`;
+        : `<button onclick="abrirModalDetalle(${indexReal})" class="text-xs bg-neutral-950 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-full font-bold uppercase tracking-wider transition">Elegir</button>`;
 
     tarjeta.innerHTML = `
       <div>
-        <div class="relative bg-neutral-100 p-4 flex items-center justify-center h-64 overflow-hidden">
+        <div onclick="abrirModalDetalle(${indexReal})" class="cursor-pointer relative bg-neutral-100 p-4 flex items-center justify-center h-64 overflow-hidden">
           <span class="absolute top-3 left-3 bg-white/90 text-neutral-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded">
             ${prod.categoria}
           </span>
@@ -201,7 +204,7 @@ function renderizarCatalogo(listaProductos) {
         </div>
         <div class="p-4">
           <p class="text-[11px] font-bold uppercase tracking-wider text-neutral-400">MENASTORE OFFICIAL</p>
-          <h3 class="font-bold text-sm text-neutral-900 mt-1 line-clamp-2 min-h-[2.5rem]">${prod.nombre}</h3>
+          <h3 onclick="abrirModalDetalle(${indexReal})" class="cursor-pointer hover:text-emerald-700 font-bold text-sm text-neutral-900 mt-1 line-clamp-2 min-h-[2.5rem] transition">${prod.nombre}</h3>
           <p class="text-neutral-500 text-xs mt-1.5">Stock disponible: ${prod.stock} uds.</p>
         </div>
       </div>
@@ -214,7 +217,75 @@ function renderizarCatalogo(listaProductos) {
   });
 }
 
-// 5. Lógica del Carrito de Compras
+// 5. Vista Rápida y Selector de Talla
+function abrirModalDetalle(indexProducto) {
+  const prod = catalogoCache[indexProducto];
+  if (!prod) return;
+
+  productoDetalleActual = prod;
+  const imgDefault = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=500&q=60';
+
+  document.getElementById('detalle-imagen').src = prod.imagen || imgDefault;
+  document.getElementById('detalle-imagen').alt = prod.nombre;
+  document.getElementById('detalle-categoria').textContent = prod.categoria;
+  document.getElementById('detalle-nombre').textContent = prod.nombre;
+  document.getElementById('detalle-precio').textContent = `₡${Number(prod.precio).toLocaleString()}`;
+  document.getElementById('detalle-stock').textContent = `Disponibles en inventario: ${prod.stock} uds.`;
+
+  const opcionesContenedor = document.getElementById('opciones-talla');
+  let tallasDisponibles = ['S', 'M', 'L', 'XL'];
+
+  if (prod.categoria === 'Calzado') {
+    tallasDisponibles = ['39', '40', '41', '42', '43'];
+  } else if (prod.categoria === 'Balones' || prod.categoria === 'Accesorios') {
+    tallasDisponibles = ['Única'];
+  }
+
+  tallaSeleccionada = tallasDisponibles.includes('M') ? 'M' : tallasDisponibles[0];
+
+  opcionesContenedor.innerHTML = tallasDisponibles.map(talla => `
+    <button type="button" onclick="seleccionarTalla('${talla}')" data-talla="${talla}" class="btn-talla px-3.5 py-2 rounded-lg text-xs font-black border transition ${talla === tallaSeleccionada ? 'bg-neutral-950 text-white border-neutral-950' : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-950'}">
+      ${talla}
+    </button>
+  `).join('');
+
+  const btnConfirmar = document.getElementById('btn-confirmar-detalle');
+  if (Number(prod.stock) <= 0) {
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'Agotado';
+    btnConfirmar.className = 'w-full bg-neutral-200 text-neutral-500 font-bold text-xs uppercase tracking-wider py-3.5 rounded-full cursor-not-allowed';
+  } else {
+    btnConfirmar.disabled = false;
+    btnConfirmar.textContent = 'Añadir al Carrito';
+    btnConfirmar.className = 'w-full bg-neutral-950 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition';
+  }
+
+  modalDetalle.classList.remove('hidden');
+}
+
+function cerrarModalDetalle() {
+  modalDetalle.classList.add('hidden');
+  productoDetalleActual = null;
+}
+
+function seleccionarTalla(talla) {
+  tallaSeleccionada = talla;
+  document.querySelectorAll('.btn-talla').forEach(btn => {
+    if (btn.dataset.talla === talla) {
+      btn.className = 'btn-talla px-3.5 py-2 rounded-lg text-xs font-black border transition bg-neutral-950 text-white border-neutral-950';
+    } else {
+      btn.className = 'btn-talla px-3.5 py-2 rounded-lg text-xs font-black border transition bg-white text-neutral-700 border-neutral-300 hover:border-neutral-950';
+    }
+  });
+}
+
+function confirmarAgregarDesdeDetalle() {
+  if (!productoDetalleActual) return;
+  agregarAlCarritoConTalla(productoDetalleActual, tallaSeleccionada);
+  cerrarModalDetalle();
+}
+
+// 6. Lógica del Carrito de Compras
 function guardarCarritoLocal() {
   localStorage.setItem('menastore_carrito', JSON.stringify(carrito));
   renderizarCarrito();
@@ -228,23 +299,28 @@ function cerrarCarrito() {
   drawerCarrito.classList.add('hidden');
 }
 
-function agregarAlCarrito(indexProducto) {
-  const prod = catalogoCache[indexProducto];
-  if (!prod) return;
-
-  const clave = prod.id || prod.nombre;
+function agregarAlCarritoConTalla(prod, talla) {
+  const baseId = prod.id || prod.nombre;
+  const clave = `${baseId}__${talla}`;
   const existente = carrito.find(item => item.clave === clave);
 
+  const totalMismoProducto = carrito
+    .filter(item => item.baseId === baseId)
+    .reduce((acc, item) => acc + item.cantidad, 0);
+
+  if (totalMismoProducto >= prod.stock) {
+    alert(`Solo hay ${prod.stock} unidades disponibles de este artículo.`);
+    return;
+  }
+
   if (existente) {
-    if (existente.cantidad >= prod.stock) {
-      alert(`Solo hay ${prod.stock} unidades disponibles de este artículo.`);
-      return;
-    }
     existente.cantidad += 1;
   } else {
     carrito.push({
       clave,
+      baseId,
       nombre: prod.nombre,
+      talla,
       precio: Number(prod.precio),
       imagen: prod.imagen,
       stockMax: Number(prod.stock),
@@ -263,10 +339,15 @@ function cambiarCantidad(clave, delta) {
   const nuevaCantidad = item.cantidad + delta;
   if (nuevaCantidad <= 0) {
     carrito = carrito.filter(i => i.clave !== clave);
-  } else if (nuevaCantidad > item.stockMax) {
-    alert(`Stock máximo alcanzado (${item.stockMax} uds.).`);
-    return;
   } else {
+    const totalMismoProducto = carrito
+      .filter(i => i.baseId === item.baseId && i.clave !== clave)
+      .reduce((acc, i) => acc + i.cantidad, 0);
+
+    if (totalMismoProducto + nuevaCantidad > item.stockMax) {
+      alert(`Stock máximo alcanzado (${item.stockMax} uds.).`);
+      return;
+    }
     item.cantidad = nuevaCantidad;
   }
 
@@ -301,7 +382,7 @@ function renderizarCarrito() {
     fila.innerHTML = `
       <div class="flex-grow">
         <h4 class="font-bold text-sm text-neutral-900">${item.nombre}</h4>
-        <p class="text-xs text-neutral-500">₡${item.precio.toLocaleString()} c/u</p>
+        <p class="text-xs text-neutral-500">Talla: <span class="font-bold text-neutral-800">${item.talla || 'Única'}</span> &bull; ₡${item.precio.toLocaleString()} c/u</p>
         <p class="text-xs font-bold text-emerald-700 mt-0.5">Subtotal: ₡${subtotal.toLocaleString()}</p>
       </div>
       <div class="flex items-center gap-2 bg-neutral-100 rounded-full px-2.5 py-1">
@@ -326,7 +407,8 @@ function enviarPedidoWhatsApp() {
   let lineas = carrito.map(item => {
     const sub = item.precio * item.cantidad;
     total += sub;
-    return `• ${item.cantidad}x ${item.nombre} — ₡${sub.toLocaleString()}`;
+    const etiquetaTalla = item.talla && item.talla !== 'Única' ? ` (Talla: ${item.talla})` : '';
+    return `• ${item.cantidad}x ${item.nombre}${etiquetaTalla} — ₡${sub.toLocaleString()}`;
   });
 
   const mensaje = `Hola MENASTORE, me gustaría realizar el siguiente pedido:\n\n${lineas.join('\n')}\n\n*Total: ₡${total.toLocaleString()}*`;
@@ -334,7 +416,7 @@ function enviarPedidoWhatsApp() {
   window.open(url, '_blank');
 }
 
-// 6. Crear o Editar Producto (INSERT / UPDATE - protegido por RLS)
+// 7. Crear o Editar Producto (INSERT / UPDATE - protegido por RLS)
 function prepararEdicion(indexProducto) {
   const prod = catalogoCache[indexProducto];
   if (!prod) return;
@@ -405,7 +487,7 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// 7. Eliminar producto (DELETE - protegido por RLS)
+// 8. Eliminar producto (DELETE - protegido por RLS)
 async function eliminarProducto(identificador) {
   if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
 
@@ -428,7 +510,7 @@ async function eliminarProducto(identificador) {
   cargarProductos();
 }
 
-// 8. Verificar sesión al iniciar
+// 9. Verificar sesión al iniciar
 async function iniciarApp() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   actualizarInterfazSesion(session ? session.user : null);
