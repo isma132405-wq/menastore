@@ -1,7 +1,7 @@
 // 1. Conexión a Supabase y configuración de tienda
 const SUPABASE_URL = 'https://hxpcucivvggfcnarwuku.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_kHoFrLbY_xMcH8XILfSkhw_LfDXMUtQ';
-const TELEFONO_WHATSAPP = '50684316789'; // Cambia por tu número real con código 506
+const SUPABASE_KEY = 'PEGA_AQUI_TU_LLAVE_EXACTA_DE_SUPABASE';
+const TELEFONO_WHATSAPP = '50688888888'; // Cambia por tu número real con código 506
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Referencias del DOM
@@ -473,7 +473,6 @@ async function enviarPedidoWhatsApp() {
   const mensaje = `Hola MENASTORE, me gustaría realizar el pedido${numeroOrden}:\n\n${lineas.join('\n')}\n\n*Total: ₡${total.toLocaleString()}*`;
   const url = `https://wa.me/${TELEFONO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
 
-  // Limpiar carrito del cliente tras registrar la orden
   carrito = [];
   guardarCarritoLocal();
   cerrarCarrito();
@@ -564,7 +563,6 @@ async function aprobarYDescontarStock(pedidoId) {
 
   if (!confirm(`¿Confirmar venta de la Orden #${pedidoId} y descontar los artículos del inventario?`)) return;
 
-  // Descontar cada artículo vendido en la tabla productos
   for (const item of pedido.detalle) {
     const prodEnCatalogo = catalogoCache.find(p => (item.productoId && p.id === item.productoId) || p.nombre === item.nombre);
     if (prodEnCatalogo) {
@@ -576,7 +574,6 @@ async function aprobarYDescontarStock(pedidoId) {
     }
   }
 
-  // Marcar orden como Completada
   const { error } = await supabaseClient
     .from('pedidos')
     .update({ estado: 'Completado' })
@@ -719,3 +716,45 @@ async function iniciarApp() {
 }
 
 iniciarApp();
+
+// 11. Carrusel automático del Hero Banner
+let slideHeroActual = 0;
+const totalSlidesHero = 3;
+let intervaloHero = null;
+
+function actualizarHero() {
+  const track = document.getElementById('hero-track');
+  if (!track) return;
+
+  track.style.transform = `translateX(-${slideHeroActual * 100}%)`;
+
+  document.querySelectorAll('.hero-dot').forEach((dot, idx) => {
+    if (idx === slideHeroActual) {
+      dot.className = 'hero-dot w-6 h-1.5 rounded-full bg-emerald-400 transition-all';
+    } else {
+      dot.className = 'hero-dot w-2.5 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all';
+    }
+  });
+}
+
+function moverHero(direccion) {
+  slideHeroActual = (slideHeroActual + direccion + totalSlidesHero) % totalSlidesHero;
+  actualizarHero();
+  reiniciarAutoplayHero();
+}
+
+function irASlideHero(indice) {
+  slideHeroActual = indice;
+  actualizarHero();
+  reiniciarAutoplayHero();
+}
+
+function reiniciarAutoplayHero() {
+  clearInterval(intervaloHero);
+  intervaloHero = setInterval(() => {
+    slideHeroActual = (slideHeroActual + 1) % totalSlidesHero;
+    actualizarHero();
+  }, 5000);
+}
+
+reiniciarAutoplayHero();
