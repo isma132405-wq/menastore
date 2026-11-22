@@ -60,33 +60,39 @@
     </nav>
   </header>
 
-  <!-- Banner principal de portada (Hero) -->
+  <!-- Banner principal de portada (Hero) con texto más compacto e imagen deportiva -->
   <section id="hero-banner" class="bg-neutral-900 text-white relative overflow-hidden">
-    <div class="max-w-7xl mx-auto px-6 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 items-center gap-8">
-      <div class="space-y-4 z-10">
-        <span class="inline-block bg-emerald-500 text-neutral-950 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-sm">Nueva Colección 2026</span>
-        <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight uppercase">
+    <div class="max-w-7xl mx-auto px-6 py-10 sm:py-12 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
+      
+      <!-- Columna izquierda: Texto más compacto -->
+      <div class="md:col-span-6 space-y-3.5 z-10">
+        <span class="inline-block bg-emerald-500 text-neutral-950 text-[11px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm">Nueva Colección 2026</span>
+        <h2 class="text-2xl sm:text-4xl font-black tracking-tight leading-snug uppercase">
           Equipate con los colores de tu pasión
         </h2>
-        <p class="text-neutral-300 text-sm sm:text-base max-w-md">
+        <p class="text-neutral-300 text-xs sm:text-sm max-w-md leading-relaxed">
           Camisetas de clubes, selecciones y artículos deportivos seleccionados. Pedidos rápidos con entrega coordinada en todo el país.
         </p>
         <div class="pt-2 flex flex-wrap gap-3">
-          <a href="#catalogo-ancla" class="bg-white text-neutral-950 hover:bg-emerald-400 font-black text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
+          <a href="#catalogo-ancla" class="bg-white text-neutral-950 hover:bg-emerald-400 font-black text-xs uppercase tracking-wider px-5 py-3 rounded-full transition">
             Explorar Catálogo
           </a>
-          <button onclick="abrirGuiaTallas()" class="border border-neutral-600 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-5 py-3.5 rounded-full transition">
+          <button onclick="abrirGuiaTallas()" class="border border-neutral-600 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition">
             Ver Guía de Tallas
           </button>
         </div>
       </div>
-      <div class="hidden md:flex justify-end">
-        <div class="bg-neutral-800/80 border border-neutral-700 rounded-2xl p-6 max-w-sm text-right space-y-2">
-          <p class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Compra Segura</p>
-          <p class="text-xl font-black">SINPE Móvil &bull; Transferencia</p>
-          <p class="text-xs text-neutral-400">Coordinación directa por WhatsApp para confirmar talla, disponibilidad y envío.</p>
-        </div>
+
+      <!-- Columna derecha: Imagen deportiva estilo campaña -->
+      <div class="md:col-span-6 relative h-56 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border border-neutral-800">
+        <img 
+          src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80" 
+          alt="Colección deportiva MENASTORE" 
+          class="w-full h-full object-cover object-center"
+        >
+        <div class="absolute inset-0 bg-gradient-to-r from-neutral-900/50 via-transparent to-transparent"></div>
       </div>
+
     </div>
   </section>
 
