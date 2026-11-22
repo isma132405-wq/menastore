@@ -1,6 +1,6 @@
 // 1. Conexión a Supabase
 const SUPABASE_URL = 'https://hxpcucivvggfcnarwuku.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_kHoFrLbY_xMcH8XILfSkhw_LfDXMUtQ';
+const SUPABASE_KEY = 'sb_publishable_kHoFrtbY_xMcH8XILFSkhw_LfDXMUtQ';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Referencias del DOM
@@ -115,7 +115,7 @@ async function cargarProductos() {
 
     tarjeta.innerHTML = `
       <div>
-        <img src="${prod.imagen || imgDefault}" alt="${prod.nombre}" class="w-full h-48 object-cover">
+        <img src="${prod.imagen || imgDefault}" alt="${prod.nombre}" class="w-full h-64 object-contain bg-white p-3 border-b border-slate-100">
         <div class="p-4">
           <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">${prod.categoria}</span>
           <h3 class="font-bold text-lg mt-1 text-slate-900">${prod.nombre}</h3>
