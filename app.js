@@ -11,11 +11,11 @@ const contador = document.getElementById('contador');
 async function cargarProductos() {
   const { data: productos, error } = await supabaseClient
     .from('productos')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*');
 
   if (error) {
     console.error('Error al cargar:', error);
+    contador.textContent = 'Error al cargar';
     return;
   }
 
@@ -37,7 +37,7 @@ async function cargarProductos() {
       </div>
       <div class="px-4 pb-4 pt-2 border-t flex justify-between items-center">
         <span class="text-lg font-black text-slate-900">₡${Number(prod.precio).toLocaleString()}</span>
-        <button onclick="eliminarProducto(${prod.id})" class="text-xs text-red-600 hover:underline font-medium">Eliminar</button>
+        <button onclick="eliminarProducto('${prod.id || prod.nombre}')" class="text-xs text-red-600 hover:underline font-medium">Eliminar</button>
       </div>
     `;
     grid.appendChild(tarjeta);
@@ -70,24 +70,33 @@ form.addEventListener('submit', async (e) => {
     alert('Error al guardar: ' + error.message);
   } else {
     form.reset();
-    cargarProductos(); // Recarga la lista automáticamente
+    cargarProductos();
   }
 });
 
 // 4. Función para ELIMINAR un producto (DELETE)
-async function eliminarProducto(id) {
+async function eliminarProducto(identificador) {
   if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
 
+  // Intenta borrar por id si existe; si no, borra por nombre
   const { error } = await supabaseClient
     .from('productos')
     .delete()
-    .eq('id', id);
+    .or(`id.eq.${identificador},nombre.eq.${identificador}`);
 
   if (error) {
-    alert('Error al eliminar');
-  } else {
-    cargarProductos();
+    // Respaldo directo por nombre si la tabla no tiene columna id
+    const { error: errorNombre } = await supabaseClient
+      .from('productos')
+      .delete()
+      .eq('nombre', identificador);
+
+    if (errorNombre) {
+      alert('Error al eliminar: ' + errorNombre.message);
+      return;
+    }
   }
+  cargarProductos();
 }
 
 // Ejecutar al abrir la página
