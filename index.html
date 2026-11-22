@@ -10,10 +10,16 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
   <!-- Barra de navegación -->
-  <nav class="bg-slate-900 text-white px-6 py-4 shadow-md flex justify-between items-center">
+  <nav class="bg-slate-900 text-white px-6 py-4 shadow-md flex justify-between items-center sticky top-0 z-40">
     <h1 class="text-2xl font-black tracking-wider text-emerald-400">MENA<span class="text-white">STORE</span></h1>
-    <div class="flex items-center gap-4">
-      <span id="badge-admin" class="hidden text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold">Modo Administrador</span>
+    <div class="flex items-center gap-3">
+      <!-- Botón Carrito (visible para clientes) -->
+      <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="relative text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-2">
+        <span>Carrito</span>
+        <span id="badge-carrito" class="bg-slate-900 text-emerald-400 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+      </button>
+
+      <span id="badge-admin" class="hidden text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold">Modo Admin</span>
       <button id="btn-abrir-login" onclick="abrirModalLogin()" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-1.5 rounded-lg border border-slate-700 transition">
         Acceso Admin
       </button>
@@ -32,7 +38,7 @@
   <main class="max-w-6xl mx-auto p-6 w-full flex-grow">
     <div id="layout-principal" class="grid grid-cols-1 gap-8">
       
-      <!-- Panel de administración (Oculto por defecto para clientes) -->
+      <!-- Panel de administración -->
       <section id="panel-admin" class="hidden lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
         <h2 class="text-lg font-bold mb-4 border-b pb-2 text-slate-900">Registrar Nuevo Producto</h2>
         <form id="form-producto" class="space-y-4">
@@ -87,6 +93,33 @@
   <footer class="bg-slate-900 text-slate-400 text-center py-4 text-xs tracking-wider border-t border-slate-800 mt-10">
     PAGINA EN CONSTRUCCIÓN :) &mdash; CREADO POR <span class="text-emerald-400 font-bold">IMENA</span>
   </footer>
+
+  <!-- Drawer lateral del Carrito de Compras -->
+  <div id="drawer-carrito" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-end">
+    <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between">
+      <div class="p-5 border-b flex justify-between items-center bg-slate-900 text-white">
+        <h3 class="text-lg font-bold">Tu Carrito de Compras</h3>
+        <button onclick="cerrarCarrito()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <div id="lista-carrito" class="p-5 flex-grow overflow-y-auto space-y-4">
+        <!-- Items del carrito -->
+      </div>
+
+      <div class="p-5 border-t bg-slate-50 space-y-3">
+        <div class="flex justify-between items-center text-lg font-black text-slate-900">
+          <span>Total estimado:</span>
+          <span id="total-carrito">₡0</span>
+        </div>
+        <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-sm">
+          Confirmar Pedido por WhatsApp
+        </button>
+        <button onclick="vaciarCarrito()" class="w-full text-xs text-slate-500 hover:text-red-600 py-1 transition">
+          Vaciar carrito
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal flotante de inicio de sesión -->
   <div id="modal-login" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
