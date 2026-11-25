@@ -1,7 +1,7 @@
 // 1. Conexión a Supabase y configuración de tienda
 const SUPABASE_URL = 'https://hxpcucivvggfcnarwuku.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_kHoFrLbY_xMcH8XILfSkhw_LfDXMUtQ';
-const TELEFONO_WHATSAPP = '50684316789'; // Cambia por tu número real con código 506
+const SUPABASE_KEY = 'PEGA_AQUI_TU_LLAVE_EXACTA_DE_SUPABASE';
+const TELEFONO_WHATSAPP = '50688888888'; // Cambia por tu número real con código 506
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Referencias del DOM
@@ -92,8 +92,8 @@ function cambiarVistaAdmin(vista) {
   if (vista === 'pedidos') {
     layoutPrincipal.classList.add('hidden');
     vistaPedidos.classList.remove('hidden');
-    tabBtnPedidos.className = 'bg-[#09090B] text-[#CCFF00] text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2';
-    tabBtnInventario.className = 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition';
+    tabBtnPedidos.className = 'bg-[#111111] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2';
+    tabBtnInventario.className = 'bg-[#F5F5F5] text-zinc-600 hover:bg-zinc-200 text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition';
     cargarPedidos();
   } else {
     vistaPedidos.classList.add('hidden');
@@ -101,8 +101,8 @@ function cambiarVistaAdmin(vista) {
     layoutPrincipal.className = 'grid grid-cols-1 lg:grid-cols-3 gap-8';
     seccionCatalogo.className = 'lg:col-span-2';
     grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-6';
-    tabBtnInventario.className = 'bg-[#09090B] text-[#CCFF00] text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition';
-    tabBtnPedidos.className = 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2';
+    tabBtnInventario.className = 'bg-[#111111] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition';
+    tabBtnPedidos.className = 'bg-[#F5F5F5] text-zinc-600 hover:bg-zinc-200 text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2';
   }
 }
 
@@ -177,9 +177,9 @@ function seleccionarCategoria(categoria) {
 
   document.querySelectorAll('.btn-cat').forEach(btn => {
     if (btn.dataset.cat === categoria) {
-      btn.className = 'btn-cat bg-[#09090B] text-[#CCFF00] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap';
+      btn.className = 'btn-cat bg-[#111111] text-white text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap';
     } else {
-      btn.className = 'btn-cat bg-white text-zinc-700 border border-zinc-200 hover:border-[#09090B] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap';
+      btn.className = 'btn-cat bg-white text-zinc-600 border border-[#E4E4E7] hover:border-[#111111] text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap';
     }
   });
 
@@ -203,14 +203,14 @@ function renderizarCatalogo(listaProductos) {
   grid.innerHTML = '';
 
   if (listaProductos.length === 0) {
-    grid.innerHTML = `<div class="col-span-full text-center py-14 text-zinc-400 text-sm bg-zinc-50 rounded-2xl border border-zinc-200">No se encontraron artículos con ese criterio.</div>`;
+    grid.innerHTML = `<div class="col-span-full text-center py-14 text-zinc-400 text-sm bg-[#F5F5F5] rounded-3xl">No se encontraron artículos con ese criterio.</div>`;
     return;
   }
 
   listaProductos.forEach(prod => {
     const imgDefault = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=500&q=60';
     const tarjeta = document.createElement('article');
-    tarjeta.className = 'group bg-white rounded-xl border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-[#09090B] transition shadow-sm hover:shadow-md';
+    tarjeta.className = 'group flex flex-col justify-between';
     
     const indexReal = catalogoCache.indexOf(prod);
     const sinStock = Number(prod.stock) <= 0;
@@ -222,24 +222,24 @@ function renderizarCatalogo(listaProductos) {
          </div>`
       : sinStock
         ? `<span class="text-xs text-zinc-400 font-bold uppercase">Agotado</span>`
-        : `<button onclick="abrirModalDetalle(${indexReal})" class="text-xs bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white px-4 py-2 rounded-full font-black uppercase tracking-wider transition">Elegir</button>`;
+        : `<button onclick="abrirModalDetalle(${indexReal})" class="text-xs bg-[#111111] hover:bg-zinc-800 text-white px-5 py-2 rounded-full font-bold uppercase tracking-wider transition">Elegir</button>`;
 
     tarjeta.innerHTML = `
-      <div>
-        <div onclick="abrirModalDetalle(${indexReal})" class="cursor-pointer relative bg-[#F4F4F5] p-4 flex items-center justify-center h-64 overflow-hidden">
-          <span class="absolute top-3 left-3 bg-[#09090B] text-[#CCFF00] text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm">
+      <div class="space-y-3.5">
+        <div onclick="abrirModalDetalle(${indexReal})" class="cursor-pointer relative bg-[#F5F5F5] rounded-3xl p-4 flex items-center justify-center h-64 overflow-hidden">
+          <span class="absolute top-4 left-4 bg-white text-[#111111] text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded">
             ${prod.categoria}
           </span>
           <img src="${prod.imagen || imgDefault}" alt="${prod.nombre}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300">
         </div>
-        <div class="p-4">
-          <p class="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">MENASTORE OFFICIAL</p>
-          <h3 onclick="abrirModalDetalle(${indexReal})" class="cursor-pointer hover:underline font-bold text-sm text-[#09090B] mt-1 line-clamp-2 min-h-[2.5rem] transition">${prod.nombre}</h3>
-          <p class="text-zinc-500 text-xs mt-1.5">Stock disponible: ${prod.stock} uds.</p>
+        <div class="px-1">
+          <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#707072]">MENA STORE</p>
+          <h3 onclick="abrirModalDetalle(${indexReal})" class="cursor-pointer hover:underline font-semibold text-[15px] text-[#111111] leading-snug mt-1 line-clamp-2 min-h-[2.5rem] transition">${prod.nombre}</h3>
+          <p class="text-[#707072] text-[11px] font-medium mt-1">Stock disponible: ${prod.stock} uds.</p>
         </div>
       </div>
-      <div class="px-4 pb-4 pt-3 border-t border-zinc-100 flex justify-between items-center">
-        <span class="text-2xl font-black text-[#09090B] font-sport">₡${Number(prod.precio).toLocaleString()}</span>
+      <div class="px-1 pb-4 pt-3 border-t border-[#F4F4F5] flex justify-between items-center mt-3.5">
+        <span class="text-xl font-bold font-syne text-[#111111]">₡${Number(prod.precio).toLocaleString()}</span>
         ${accionTarjeta}
       </div>
     `;
@@ -274,7 +274,7 @@ function abrirModalDetalle(indexProducto) {
   tallaSeleccionada = tallasDisponibles.includes('M') ? 'M' : tallasDisponibles[0];
 
   opcionesContenedor.innerHTML = tallasDisponibles.map(talla => `
-    <button type="button" onclick="seleccionarTalla('${talla}')" data-talla="${talla}" class="btn-talla px-3.5 py-2 rounded-lg text-xs font-black border transition ${talla === tallaSeleccionada ? 'bg-[#09090B] text-[#CCFF00] border-[#09090B]' : 'bg-white text-zinc-700 border-zinc-300 hover:border-[#09090B]'}">
+    <button type="button" onclick="seleccionarTalla('${talla}')" data-talla="${talla}" class="btn-talla px-4 py-2.5 rounded-xl text-xs font-bold border transition ${talla === tallaSeleccionada ? 'bg-[#111111] text-white border-[#111111]' : 'bg-white text-zinc-600 border-[#E4E4E7] hover:border-[#111111]'}">
       ${talla}
     </button>
   `).join('');
@@ -283,11 +283,11 @@ function abrirModalDetalle(indexProducto) {
   if (Number(prod.stock) <= 0) {
     btnConfirmar.disabled = true;
     btnConfirmar.textContent = 'Agotado';
-    btnConfirmar.className = 'w-full bg-zinc-200 text-zinc-500 font-bold text-xs uppercase tracking-wider py-3.5 rounded-full cursor-not-allowed';
+    btnConfirmar.className = 'w-full bg-[#E4E4E7] text-zinc-400 font-bold text-xs uppercase tracking-wider py-4 rounded-full cursor-not-allowed';
   } else {
     btnConfirmar.disabled = false;
     btnConfirmar.textContent = 'Añadir al Carrito';
-    btnConfirmar.className = 'w-full bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white font-black text-xs uppercase tracking-wider py-3.5 rounded-full transition';
+    btnConfirmar.className = 'w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-full transition';
   }
 
   modalDetalle.classList.remove('hidden');
@@ -302,9 +302,9 @@ function seleccionarTalla(talla) {
   tallaSeleccionada = talla;
   document.querySelectorAll('.btn-talla').forEach(btn => {
     if (btn.dataset.talla === talla) {
-      btn.className = 'btn-talla px-3.5 py-2 rounded-lg text-xs font-black border transition bg-[#09090B] text-[#CCFF00] border-[#09090B]';
+      btn.className = 'btn-talla px-4 py-2.5 rounded-xl text-xs font-bold border transition bg-[#111111] text-white border-[#111111]';
     } else {
-      btn.className = 'btn-talla px-3.5 py-2 rounded-lg text-xs font-black border transition bg-white text-zinc-700 border-zinc-300 hover:border-[#09090B]';
+      btn.className = 'btn-talla px-4 py-2.5 rounded-xl text-xs font-bold border transition bg-white text-zinc-600 border-[#E4E4E7] hover:border-[#111111]';
     }
   });
 }
@@ -396,7 +396,7 @@ function renderizarCarrito() {
   badgeCarrito.textContent = totalUnidades;
 
   if (carrito.length === 0) {
-    listaCarrito.innerHTML = `<p class="text-center text-zinc-400 text-sm py-12">Tu carrito está vacío. Agrega artículos del catálogo para empezar.</p>`;
+    listaCarrito.innerHTML = `<p class="text-center text-zinc-400 text-sm py-12">Tu carrito está vacío. Agrega artículos para empezar.</p>`;
     totalCarritoEl.textContent = '₡0';
     return;
   }
@@ -409,17 +409,17 @@ function renderizarCarrito() {
     totalColones += subtotal;
 
     const fila = document.createElement('div');
-    fila.className = 'flex items-center justify-between gap-3 border-b pb-3';
+    fila.className = 'flex items-center justify-between gap-4 border-b border-[#F4F4F5] pb-3.5';
     fila.innerHTML = `
       <div class="flex-grow">
-        <h4 class="font-bold text-sm text-[#09090B]">${item.nombre}</h4>
-        <p class="text-xs text-zinc-500">Talla: <span class="font-bold text-zinc-800">${item.talla || 'Única'}</span> &bull; ₡${item.precio.toLocaleString()} c/u</p>
-        <p class="text-xs font-extrabold text-[#09090B] mt-0.5">Subtotal: ₡${subtotal.toLocaleString()}</p>
+        <h4 class="font-bold text-sm text-[#111111]">${item.nombre}</h4>
+        <p class="text-xs text-[#707072] mt-0.5">Talla: <span class="font-bold text-[#111111]">${item.talla || 'Única'}</span> &bull; ₡${item.precio.toLocaleString()} c/u</p>
+        <p class="text-xs font-bold text-[#111111] mt-1 font-syne">Subtotal: ₡${subtotal.toLocaleString()}</p>
       </div>
-      <div class="flex items-center gap-2 bg-zinc-100 rounded-full px-2.5 py-1">
+      <div class="flex items-center gap-2 bg-[#F5F5F5] rounded-full px-3 py-1">
         <button onclick="cambiarCantidad('${item.clave}', -1)" class="w-6 h-6 font-bold text-zinc-700 hover:text-red-600">-</button>
         <span class="text-sm font-bold w-5 text-center">${item.cantidad}</span>
-        <button onclick="cambiarCantidad('${item.clave}', 1)" class="w-6 h-6 font-bold text-zinc-700 hover:text-[#09090B]">+</button>
+        <button onclick="cambiarCantidad('${item.clave}', 1)" class="w-6 h-6 font-bold text-zinc-700 hover:text-black">+</button>
       </div>
     `;
     listaCarrito.appendChild(fila);
@@ -469,7 +469,7 @@ async function enviarPedidoWhatsApp() {
   }
 
   const numeroOrden = pedidoCreado ? ` #${pedidoCreado.id}` : '';
-  const mensaje = `Hola MENASTORE, me gustaría realizar el pedido${numeroOrden}:\n\n${lineas.join('\n')}\n\n*Total: ₡${total.toLocaleString()}*`;
+  const mensaje = `Hola MENA STORE, me gustaría realizar el pedido${numeroOrden}:\n\n${lineas.join('\n')}\n\n*Total: ₡${total.toLocaleString()}*`;
   const url = `https://wa.me/${TELEFONO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
 
   carrito = [];
@@ -496,7 +496,7 @@ async function cargarPedidos() {
   badgePedidosPendientes.textContent = pendientes;
 
   if (pedidos.length === 0) {
-    listaPedidosAdmin.innerHTML = `<div class="text-center py-12 bg-zinc-50 rounded-2xl border border-zinc-200 text-zinc-400 text-sm">Aún no se han recibido pedidos desde la tienda.</div>`;
+    listaPedidosAdmin.innerHTML = `<div class="text-center py-14 bg-[#F5F5F5] rounded-3xl text-zinc-400 text-sm">Aún no se han recibido pedidos desde la tienda.</div>`;
     return;
   }
 
@@ -507,56 +507,56 @@ async function cargarPedidos() {
 
     const esPendiente = pedido.estado === 'Pendiente';
     const badgeEstado = esPendiente
-      ? `<span class="bg-amber-100 text-amber-800 text-[11px] font-black uppercase px-2.5 py-1 rounded-full">Pendiente</span>`
+      ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold uppercase px-3 py-1 rounded">Pendiente</span>`
       : pedido.estado === 'Completado'
-        ? `<span class="bg-[#CCFF00] text-[#09090B] text-[11px] font-black uppercase px-2.5 py-1 rounded-full">Completado (Stock descontado)</span>`
-        : `<span class="bg-red-100 text-red-700 text-[11px] font-black uppercase px-2.5 py-1 rounded-full">Cancelado</span>`;
+        ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase px-3 py-1 rounded">Completado (Stock descontado)</span>`
+        : `<span class="bg-red-100 text-red-700 text-[10px] font-bold uppercase px-3 py-1 rounded">Cancelado</span>`;
 
     const itemsHtml = (pedido.detalle || []).map(item => `
       <li class="text-xs text-zinc-700 flex justify-between py-1 border-b border-zinc-100 last:border-0">
-        <span><strong>${item.cantidad}x</strong> ${item.nombre} <span class="text-zinc-400">(Talla: ${item.talla || 'Única'})</span></span>
+        <span><strong>${item.cantidad}x</strong> ${item.nombre} <span class="text-zinc-400 font-medium">(Talla: ${item.talla || 'Única'})</span></span>
         <span class="font-bold">₡${(item.precio * item.cantidad).toLocaleString()}</span>
       </li>
     `).join('');
 
     const accionesPedido = esPendiente
-      ? `<div class="flex flex-wrap gap-2 pt-3">
-           <button onclick="aprobarYDescontarStock(${pedido.id})" class="bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-lg transition">
+      ? `<div class="flex flex-wrap gap-2 pt-3 border-t mt-3 border-[#E4E4E7]">
+           <button onclick="aprobarYDescontarStock(${pedido.id})" class="bg-[#111111] hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full transition shadow-sm">
              Completar y Descontar Stock
            </button>
-           <button onclick="cambiarEstadoPedido(${pedido.id}, 'Cancelado')" class="bg-white border border-zinc-300 hover:border-red-600 text-zinc-600 hover:text-red-600 text-xs font-bold uppercase px-3 py-2 rounded-lg transition">
+           <button onclick="cambiarEstadoPedido(${pedido.id}, 'Cancelado')" class="bg-white border border-[#E4E4E7] hover:border-red-600 text-zinc-600 hover:text-red-600 text-xs font-bold uppercase px-4 py-2.5 rounded-full transition">
              Cancelar
            </button>
          </div>`
-      : `<div class="pt-2 flex justify-end">
+      : `<div class="pt-3 border-t border-[#E4E4E7] flex justify-end">
            <button onclick="eliminarPedido(${pedido.id})" class="text-xs text-zinc-400 hover:text-red-600 underline">Eliminar registro</button>
          </div>`;
 
     return `
-      <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-3">
-        <div class="flex flex-wrap justify-between items-start gap-2 border-b border-zinc-100 pb-3">
+      <div class="bg-white rounded-3xl border border-[#E4E4E7] p-6 shadow-sm space-y-4">
+        <div class="flex flex-wrap justify-between items-start gap-2 pb-2">
           <div>
             <div class="flex items-center gap-2.5">
-              <span class="text-xl font-black text-[#09090B] font-sport">Orden #${pedido.id}</span>
+              <span class="text-xl font-bold font-syne text-[#111111]">Orden #${pedido.id}</span>
               ${badgeEstado}
             </div>
-            <p class="text-xs text-zinc-500 mt-1">
+            <p class="text-xs text-[#707072] mt-1.5">
               <strong>Cliente:</strong> ${pedido.cliente_nombre} &bull; <strong>Tel:</strong> ${pedido.cliente_telefono} &bull; ${fechaFormateada}
             </p>
           </div>
           <div class="text-right">
-            <p class="text-[11px] uppercase tracking-wider text-zinc-400 font-bold">Total Pedido</p>
-            <p class="text-2xl font-black text-[#09090B] font-sport">₡${Number(pedido.total).toLocaleString()}</p>
+            <p class="text-[10px] uppercase tracking-widest text-zinc-400 font-extrabold">Total Pedido</p>
+            <p class="text-2xl font-extrabold font-syne text-[#111111]">₡${Number(pedido.total).toLocaleString()}</p>
           </div>
         </div>
-        <ul class="bg-zinc-50 rounded-xl p-3">${itemsHtml}</ul>
+        <ul class="bg-[#F5F5F5] rounded-2xl p-4 divide-y divide-[#E4E4E7]/40">${itemsHtml}</ul>
         ${accionesPedido}
       </div>
     `;
   }).join('');
 }
 
-async function aprobarYDescontarStock(pedidoId) {
+async function  aprobarYDescontarStock(pedidoId) {
   const pedido = pedidosCache.find(p => p.id === pedidoId);
   if (!pedido) return;
 
@@ -630,7 +630,7 @@ function prepararEdicion(indexProducto) {
 
   tituloFormAdmin.textContent = 'Editar Artículo';
   btnGuardar.textContent = 'Actualizar Artículo';
-  btnGuardar.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-wider py-3 rounded-lg transition';
+  btnGuardar.className = 'w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition';
   btnCancelarEdicion.classList.remove('hidden');
 
   panelAdmin.scrollIntoView({ behavior: 'smooth' });
@@ -642,7 +642,7 @@ function cancelarEdicion() {
   nombreOriginalEditando = null;
   tituloFormAdmin.textContent = 'Nuevo Artículo';
   btnGuardar.textContent = 'Guardar en Catálogo';
-  btnGuardar.className = 'w-full bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white font-black text-xs uppercase tracking-wider py-3 rounded-lg transition';
+  btnGuardar.className = 'w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm';
   btnCancelarEdicion.classList.add('hidden');
 }
 
@@ -729,9 +729,9 @@ function actualizarHero() {
 
   document.querySelectorAll('.hero-dot').forEach((dot, idx) => {
     if (idx === slideHeroActual) {
-      dot.className = 'hero-dot w-6 h-1.5 rounded-full bg-[#CCFF00] transition-all';
+      dot.className = 'hero-dot w-6.5 h-1 rounded-full bg-white transition-all';
     } else {
-      dot.className = 'hero-dot w-2.5 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all';
+      dot.className = 'hero-dot w-2.5 h-1 rounded-full bg-white/30 hover:bg-white/50 transition-all';
     }
   });
 }

@@ -7,213 +7,218 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Fuentes deportivas de Google Fonts -->
+  <!-- Tipografía moderna: Syne (para encabezados) e Inter (para lectura general) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
-    h1, h2, .font-sport {
-      font-family: 'Barlow Condensed', sans-serif;
-      letter-spacing: 0.02em;
+    h1, h2, h3, .font-syne {
+      font-family: 'Syne', sans-serif;
+    }
+    /* Estilos sutiles de carrusel */
+    #hero-track {
+      display: flex;
+      transition: transform 0.70s cubic-bezier(0.25, 1, 0.5, 1);
     }
   </style>
 </head>
-<body class="bg-white text-[#09090B] min-h-screen flex flex-col antialiased">
+<body class="bg-white text-[#111111] min-h-screen flex flex-col antialiased">
 
   <!-- Barra superior de avisos e información rápida -->
-  <div class="bg-[#09090B] text-zinc-300 text-xs px-4 py-2 border-b border-zinc-800">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1">
-      <p class="font-semibold tracking-wide text-[#CCFF00]">PAGINA EN CONSTRUCCIÓN :) &bull; ENVÍOS A TODO COSTA RICA</p>
-      <div class="flex items-center gap-4 text-zinc-300">
-        <button onclick="abrirGuiaTallas()" class="hover:text-white underline underline-offset-2 transition">Guía de tallas</button>
+  <div class="bg-[#111111] text-[#A1A1AA] text-[11px] px-6 py-2">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1.5 font-medium tracking-wide">
+      <p class="text-white uppercase font-semibold tracking-wider flex items-center gap-2">
+        <span class="w-1.5 h-1.5 bg-[#DC2626] rounded-full animate-ping"></span>
+        Envíos a todo Costa Rica • Pedidos fáciles por WhatsApp
+      </p>
+      <div class="flex items-center gap-4">
+        <button onclick="abrirGuiaTallas()" class="hover:text-white transition">Guía de tallas</button>
         <span>&bull;</span>
-        <button id="btn-abrir-login" onclick="abrirModalLogin()" class="hover:text-[#CCFF00] transition font-medium">Acceso Admin</button>
-        <span id="badge-admin" class="hidden text-[#CCFF00] font-bold">Modo Admin Activo</span>
-        <button id="btn-cerrar-sesion" onclick="cerrarSesion()" class="hidden text-red-400 hover:text-red-300 font-semibold transition">Cerrar Sesión</button>
+        <button id="btn-abrir-login" onclick="abrirModalLogin()" class="hover:text-white transition">Acceso Admin</button>
+        <span id="badge-admin" class="hidden text-white font-bold tracking-wider">MODO ADMIN ACTIVO</span>
+        <button id="btn-cerrar-sesion" onclick="cerrarSesion()" class="hidden text-[#F87171] font-semibold transition">Cerrar Sesión</button>
       </div>
     </div>
   </div>
 
   <!-- Cabecera principal estilo retail -->
-  <header class="bg-white border-b border-zinc-200 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
-      <a href="#" onclick="seleccionarCategoria('Todas')" class="text-3xl sm:text-4xl font-black italic tracking-tight text-[#09090B] font-sport">
-        MENA<span class="bg-[#09090B] text-[#CCFF00] px-1.5 py-0.5 ml-0.5 not-italic rounded-sm">STORE</span>
+  <header class="bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-[#F4F4F5]">
+      <a href="#" onclick="seleccionarCategoria('Todas')" class="text-2xl sm:text-3xl font-extrabold uppercase tracking-tighter text-[#111111] font-syne hover:opacity-85 transition">
+        MENA STORE
       </a>
 
-      <div class="order-3 md:order-2 w-full md:w-96 lg:w-[28rem]">
+      <!-- Buscador tipo Nike -->
+      <div class="order-3 md:order-2 w-full md:w-96">
         <div class="relative">
-          <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar camiseta, equipo o artículo deportivo..." class="w-full bg-zinc-100 border border-zinc-200 focus:bg-white focus:border-[#09090B] rounded-full pl-4 pr-10 py-2 text-sm outline-none transition">
-          <span class="absolute right-3.5 top-2 text-zinc-400 text-sm">&#128269;</span>
+          <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar en MENA STORE..." class="w-full bg-[#F5F5F5] border-0 rounded-full pl-5 pr-12 py-2.5 text-sm outline-none focus:bg-[#EAEAEA] placeholder-zinc-500 transition">
+          <span class="absolute right-4 top-3 text-zinc-400 text-sm">&#128269;</span>
         </div>
       </div>
 
-      <div class="order-2 md:order-3 flex items-center gap-3">
-        <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="bg-[#09090B] hover:bg-zinc-800 text-white px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold transition flex items-center gap-2 shadow-sm">
-          <span>Carrito</span>
-          <span id="badge-carrito" class="bg-[#CCFF00] text-[#09090B] text-xs font-black px-2 py-0.5 rounded-full">0</span>
+      <div class="order-2 md:order-3 flex items-center gap-4">
+        <button id="btn-abrir-carrito" onclick="abrirCarrito()" class="relative bg-[#111111] hover:bg-zinc-800 text-white w-10 h-10 rounded-full flex items-center justify-center transition shadow-sm">
+          <span>🛒</span>
+          <span id="badge-carrito" class="absolute -top-1 -right-1 bg-[#111111] border-2 border-white text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">0</span>
         </button>
       </div>
     </div>
 
     <!-- Barra de navegación por categorías -->
-    <nav class="bg-zinc-50 border-t border-zinc-200">
-      <div id="filtros-categoria" class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center gap-2 overflow-x-auto">
-        <button onclick="seleccionarCategoria('Todas')" data-cat="Todas" class="btn-cat bg-[#09090B] text-[#CCFF00] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Todo el catálogo</button>
-        <button onclick="seleccionarCategoria('Camisetas')" data-cat="Camisetas" class="btn-cat bg-white text-zinc-700 border border-zinc-200 hover:border-[#09090B] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Camisetas</button>
-        <button onclick="seleccionarCategoria('Calzado')" data-cat="Calzado" class="btn-cat bg-white text-zinc-700 border border-zinc-200 hover:border-[#09090B] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Calzado</button>
-        <button onclick="seleccionarCategoria('Balones')" data-cat="Balones" class="btn-cat bg-white text-zinc-700 border border-zinc-200 hover:border-[#09090B] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Balones</button>
-        <button onclick="seleccionarCategoria('Accesorios')" data-cat="Accesorios" class="btn-cat bg-white text-zinc-700 border border-zinc-200 hover:border-[#09090B] text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full transition whitespace-nowrap">Accesorios</button>
+    <nav class="bg-white border-b border-[#F4F4F5]">
+      <div id="filtros-categoria" class="max-w-7xl mx-auto px-6 sm:px-8 py-3 flex items-center gap-3 overflow-x-auto">
+        <button onclick="seleccionarCategoria('Todas')" data-cat="Todas" class="btn-cat bg-[#111111] text-white text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap">Todo el catálogo</button>
+        <button onclick="seleccionarCategoria('Camisetas')" data-cat="Camisetas" class="btn-cat bg-white text-zinc-600 border border-[#E4E4E7] hover:border-[#111111] text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap">Camisetas</button>
+        <button onclick="seleccionarCategoria('Calzado')" data-cat="Calzado" class="btn-cat bg-white text-zinc-600 border border-[#E4E4E7] hover:border-[#111111] text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap">Calzado</button>
+        <button onclick="seleccionarCategoria('Balones')" data-cat="Balones" class="btn-cat bg-white text-zinc-600 border border-[#E4E4E7] hover:border-[#111111] text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap">Balones</button>
+        <button onclick="seleccionarCategoria('Accesorios')" data-cat="Accesorios" class="btn-cat bg-white text-zinc-600 border border-[#E4E4E7] hover:border-[#111111] text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full transition whitespace-nowrap">Accesorios</button>
       </div>
     </nav>
   </header>
 
   <!-- Banner principal de portada (Hero Carrusel) -->
-  <section id="hero-banner" class="bg-[#09090B] text-white relative overflow-hidden group">
+  <section id="hero-banner" class="bg-[#111111] text-white relative overflow-hidden">
     <div id="hero-track" class="flex transition-transform duration-700 ease-out">
       
       <!-- Slide 1 -->
       <div class="w-full flex-shrink-0">
-        <div class="max-w-7xl mx-auto px-6 py-10 sm:py-12 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
-          <div class="md:col-span-6 space-y-3.5 z-10">
-            <span class="inline-block bg-[#CCFF00] text-[#09090B] text-[11px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm">Nueva Colección 2026</span>
-            <h2 class="text-3xl sm:text-5xl font-black italic tracking-tight leading-none uppercase">
-              Equipate con los colores de tu pasión
+        <div class="max-w-7xl mx-auto px-8 py-14 sm:py-20 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
+          <div class="md:col-span-6 space-y-4">
+            <span class="inline-block bg-[#F5F5F5] text-[#111111] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-sm">Nueva Colección 2026</span>
+            <h2 class="text-3xl sm:text-6xl font-extrabold tracking-tighter uppercase leading-none font-syne">
+              EQUÍPATE CON LOS COLORES DE TU PASIÓN
             </h2>
-            <p class="text-zinc-300 text-xs sm:text-sm max-w-md leading-relaxed">
-              Camisetas de clubes, selecciones y artículos deportivos seleccionados. Pedidos rápidos con entrega coordinada en todo el país.
+            <p class="text-[#A1A1AA] text-xs sm:text-sm max-w-sm leading-relaxed font-light">
+              Camisetas oficiales, calzado de alto rendimiento e indumentaria. Envíos y atención coordinada por WhatsApp.
             </p>
             <div class="pt-2 flex flex-wrap gap-3">
-              <a href="#catalogo-ancla" class="bg-[#CCFF00] text-[#09090B] hover:bg-[#d9ff33] font-black text-xs uppercase tracking-wider px-6 py-3 rounded-full transition">
+              <a href="#catalogo-ancla" class="bg-white text-[#111111] hover:bg-zinc-200 font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
                 Explorar Catálogo
               </a>
-              <button onclick="abrirGuiaTallas()" class="border border-zinc-700 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition">
-                Ver Guía de Tallas
+              <button onclick="abrirGuiaTallas()" class="border border-zinc-700 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
+                Guía de Tallas
               </button>
             </div>
           </div>
-          <div class="md:col-span-6 relative h-56 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
-            <img src="https://peninsuladeportiva.com/wp-content/uploads/2023/01/Lionel-Messi-cargando-Copa-del-Mundo-falsa-tras-vencer-a-Francia-en-final-del-mundial-de-Qatar-1200x600.jpg" alt="Colección deportiva" class="w-full h-full object-cover object-center">
-            <div class="absolute inset-0 bg-gradient-to-r from-[#09090B]/50 via-transparent to-transparent"></div>
+          <div class="md:col-span-6 h-60 sm:h-80 rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800">
+            <img src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80" alt="Colección deportiva" class="w-full h-full object-cover">
           </div>
         </div>
       </div>
 
       <!-- Slide 2 -->
       <div class="w-full flex-shrink-0">
-        <div class="max-w-7xl mx-auto px-6 py-10 sm:py-12 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
-          <div class="md:col-span-6 space-y-3.5 z-10">
-            <span class="inline-block bg-[#CCFF00] text-[#09090B] text-[11px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm">Fútbol &amp; Rendimiento</span>
-            <h2 class="text-3xl sm:text-5xl font-black italic tracking-tight leading-none uppercase">
-              Calzado y balones listos para la cancha
+        <div class="max-w-7xl mx-auto px-8 py-14 sm:py-20 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
+          <div class="md:col-span-6 space-y-4">
+            <span class="inline-block bg-[#F5F5F5] text-[#111111] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-sm">Rendimiento deportivo</span>
+            <h2 class="text-3xl sm:text-6xl font-extrabold tracking-tighter uppercase leading-none font-syne">
+              CALZADO Y BALONES LISTOS PARA LA CANCHA
             </h2>
-            <p class="text-zinc-300 text-xs sm:text-sm max-w-md leading-relaxed">
-              Equípate para cada mejenga o entrenamiento con tacos, tenis y balones de alto desempeño.
+            <p class="text-[#A1A1AA] text-xs sm:text-sm max-w-sm leading-relaxed font-light">
+              Tacos, tenis y equipamiento seleccionado para dar el máximo desempeño en cada entrenamiento.
             </p>
             <div class="pt-2 flex flex-wrap gap-3">
-              <button onclick="seleccionarCategoria('Calzado'); document.getElementById('catalogo-ancla').scrollIntoView({behavior:'smooth'})" class="bg-[#CCFF00] text-[#09090B] hover:bg-[#d9ff33] font-black text-xs uppercase tracking-wider px-6 py-3 rounded-full transition">
+              <button onclick="seleccionarCategoria('Calzado'); document.getElementById('catalogo-ancla').scrollIntoView({behavior:'smooth'})" class="bg-white text-[#111111] hover:bg-zinc-200 font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
                 Ver Calzado
               </button>
-              <button onclick="seleccionarCategoria('Balones'); document.getElementById('catalogo-ancla').scrollIntoView({behavior:'smooth'})" class="border border-zinc-700 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition">
+              <button onclick="seleccionarCategoria('Balones'); document.getElementById('catalogo-ancla').scrollIntoView({behavior:'smooth'})" class="border border-zinc-700 hover:border-white text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
                 Ver Balones
               </button>
             </div>
           </div>
-          <div class="md:col-span-6 relative h-56 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
-            <img src="https://icdn.psgtalk.com/wp-content/uploads/2025/02/desire-doue-paris-saint-germain-v-manchester-city-uefa-champions-league-2025-1200x675.jpg" alt="Balones y calzado" class="w-full h-full object-cover object-center">
-            <div class="absolute inset-0 bg-gradient-to-r from-[#09090B]/50 via-transparent to-transparent"></div>
+          <div class="md:col-span-6 h-60 sm:h-80 rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800">
+            <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1200&q=80" alt="Balones y calzado" class="w-full h-full object-cover">
           </div>
         </div>
       </div>
 
       <!-- Slide 3 -->
       <div class="w-full flex-shrink-0">
-        <div class="max-w-7xl mx-auto px-6 py-10 sm:py-12 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
-          <div class="md:col-span-6 space-y-3.5 z-10">
-            <span class="inline-block bg-[#CCFF00] text-[#09090B] text-[11px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm">Envíos a Todo el País</span>
-            <h2 class="text-3xl sm:text-5xl font-black italic tracking-tight leading-none uppercase">
-              Compra fácil y directo por WhatsApp
+        <div class="max-w-7xl mx-auto px-8 py-14 sm:py-20 grid grid-cols-1 md:grid-cols-12 items-center gap-8">
+          <div class="md:col-span-6 space-y-4">
+            <span class="inline-block bg-[#F5F5F5] text-[#111111] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-sm">Envíos a todo el país</span>
+            <h2 class="text-3xl sm:text-6xl font-extrabold tracking-tighter uppercase leading-none font-syne">
+              COMPRA FÁCIL Y DIRECTO POR WHATSAPP
             </h2>
-            <p class="text-zinc-300 text-xs sm:text-sm max-w-md leading-relaxed">
-              Elegí tu talla, armá tu carrito y coordiná tu envío a cualquier parte de Costa Rica sin complicaciones.
+            <p class="text-[#A1A1AA] text-xs sm:text-sm max-w-sm leading-relaxed font-light">
+              Elegí tu talla, armá tu carrito de compras y recibí en cualquier parte de Costa Rica de forma rápida y segura.
             </p>
             <div class="pt-2 flex flex-wrap gap-3">
-              <a href="#catalogo-ancla" class="bg-[#CCFF00] text-[#09090B] hover:bg-[#d9ff33] font-black text-xs uppercase tracking-wider px-6 py-3 rounded-full transition">
+              <a href="#catalogo-ancla" class="bg-white text-[#111111] hover:bg-zinc-200 font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition">
                 Ir a la Tienda
               </a>
             </div>
           </div>
-          <div class="md:col-span-6 relative h-56 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
-            <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?auto=format&fit=crop&w=1200&q=80" alt="Estadio y camisetas" class="w-full h-full object-cover object-center">
-            <div class="absolute inset-0 bg-gradient-to-r from-[#09090B]/50 via-transparent to-transparent"></div>
+          <div class="md:col-span-6 h-60 sm:h-80 rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800">
+            <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?auto=format&fit=crop&w=1200&q=80" alt="Estadio y camisetas" class="w-full h-full object-cover">
           </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Flechas laterales -->
-    <button onclick="moverHero(-1)" aria-label="Anterior" class="hidden sm:flex items-center justify-center absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-[#CCFF00] hover:text-[#09090B] text-white border border-white/15 transition z-20">
+    <!-- Flechas laterales sutiles -->
+    <button onclick="moverHero(-1)" aria-label="Anterior" class="hidden sm:flex items-center justify-center absolute left-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/5 hover:bg-white/15 text-white transition z-20">
       &#10094;
     </button>
-    <button onclick="moverHero(1)" aria-label="Siguiente" class="hidden sm:flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-[#CCFF00] hover:text-[#09090B] text-white border border-white/15 transition z-20">
+    <button onclick="moverHero(1)" aria-label="Siguiente" class="hidden sm:flex items-center justify-center absolute right-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/5 hover:bg-white/15 text-white transition z-20">
       &#10095;
     </button>
 
-    <!-- Indicadores inferiores (puntos) -->
-    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-      <button onclick="irASlideHero(0)" class="hero-dot w-6 h-1.5 rounded-full bg-[#CCFF00] transition-all"></button>
-      <button onclick="irASlideHero(1)" class="hero-dot w-2.5 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all"></button>
-      <button onclick="irASlideHero(2)" class="hero-dot w-2.5 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all"></button>
+    <!-- Indicadores inferiores (puntos) sutiles -->
+    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-20">
+      <button onclick="irASlideHero(0)" class="hero-dot w-6 h-1 rounded-full bg-white transition-all"></button>
+      <button onclick="irASlideHero(1)" class="hero-dot w-2 h-1 rounded-full bg-white/30 hover:bg-white/50 transition-all"></button>
+      <button onclick="irASlideHero(2)" class="hero-dot w-2 h-1 rounded-full bg-white/30 hover:bg-white/50 transition-all"></button>
     </div>
   </section>
 
   <!-- Contenedor principal -->
-  <main id="catalogo-ancla" class="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full flex-grow">
+  <main id="catalogo-ancla" class="max-w-7xl mx-auto px-6 sm:px-8 py-10 w-full flex-grow">
     
     <!-- Navegación exclusiva del Administrador (Inventario vs Pedidos) -->
-    <div id="tabs-admin" class="hidden mb-8 flex gap-3 border-b border-zinc-200 pb-4">
-      <button onclick="cambiarVistaAdmin('inventario')" id="tab-btn-inventario" class="bg-[#09090B] text-[#CCFF00] text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition">
+    <div id="tabs-admin" class="hidden mb-10 flex gap-4 border-b border-[#F4F4F5] pb-4">
+      <button onclick="cambiarVistaAdmin('inventario')" id="tab-btn-inventario" class="bg-[#111111] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition">
         Gestión de Inventario
       </button>
-      <button onclick="cambiarVistaAdmin('pedidos')" id="tab-btn-pedidos" class="bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2">
+      <button onclick="cambiarVistaAdmin('pedidos')" id="tab-btn-pedidos" class="bg-[#F5F5F5] text-zinc-600 hover:bg-zinc-200 text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition flex items-center gap-2">
         <span>Historial de Pedidos</span>
-        <span id="badge-pedidos-pendientes" class="bg-[#CCFF00] text-[#09090B] text-[11px] font-black px-2 py-0.5 rounded-full">0</span>
+        <span id="badge-pedidos-pendientes" class="bg-[#111111] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">0</span>
       </button>
     </div>
 
     <!-- Vista 1: Inventario y Catálogo -->
-    <div id="layout-principal" class="grid grid-cols-1 gap-8">
+    <div id="layout-principal" class="grid grid-cols-1 gap-12">
       
-      <!-- Panel de administración -->
-      <section id="panel-admin" class="hidden lg:col-span-1 bg-zinc-50 p-6 rounded-2xl border border-zinc-200 h-fit">
-        <div class="flex justify-between items-center mb-4 border-b border-zinc-200 pb-3">
-          <h2 id="titulo-form-admin" class="text-xl font-black uppercase tracking-wide text-[#09090B]">Nuevo Artículo</h2>
-          <button type="button" id="btn-cancelar-edicion" onclick="cancelarEdicion()" class="hidden text-xs text-red-600 hover:underline font-semibold">Cancelar</button>
+      <!-- Panel de administración en caja gris minimalista -->
+      <section id="panel-admin" class="hidden lg:col-span-1 bg-[#F5F5F5] p-6 rounded-3xl h-fit border border-[#ECECEB]">
+        <div class="flex justify-between items-center mb-6 border-b border-zinc-200 pb-3">
+          <h2 id="titulo-form-admin" class="text-xl font-bold uppercase tracking-tight text-[#111111] font-syne">Nuevo Artículo</h2>
+          <button type="button" id="btn-cancelar-edicion" onclick="cancelarEdicion()" class="text-xs text-[#DC2626] hover:underline font-semibold">Cancelar</button>
         </div>
         <form id="form-producto" class="space-y-4">
           <input type="hidden" id="edit-id">
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">Nombre del artículo</label>
-            <input type="text" id="nombre" required placeholder="Ej. Camiseta FC Barcelona" class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Nombre del artículo</label>
+            <input type="text" id="nombre" required placeholder="Ej. Camiseta FC Barcelona" class="w-full bg-white border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">Precio (₡)</label>
-              <input type="number" id="precio" required placeholder="25000" class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+              <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Precio (₡)</label>
+              <input type="number" id="precio" required placeholder="25000" class="w-full bg-white border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">Stock</label>
-              <input type="number" id="stock" required placeholder="10" class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+              <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Stock</label>
+              <input type="number" id="stock" required placeholder="10" class="w-full bg-white border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">Categoría</label>
-            <select id="categoria" class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Categoría</label>
+            <select id="categoria" class="w-full bg-white border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
               <option value="Camisetas">Camisetas</option>
               <option value="Calzado">Calzado</option>
               <option value="Balones">Balones</option>
@@ -221,10 +226,10 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">URL de la imagen</label>
-            <input type="url" id="imagen" placeholder="https://..." class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">URL de la imagen</label>
+            <input type="url" id="imagen" placeholder="https://..." class="w-full bg-white border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
           </div>
-          <button type="submit" id="btn-guardar" class="w-full bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white font-black text-xs uppercase tracking-wider py-3 rounded-lg transition">
+          <button type="submit" id="btn-guardar" class="w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm">
             Guardar en Catálogo
           </button>
         </form>
@@ -232,13 +237,13 @@
 
       <!-- Catálogo público -->
       <section id="seccion-catalogo" class="col-span-1">
-        <div class="flex justify-between items-end mb-6 border-b border-zinc-200 pb-3">
+        <div class="flex justify-between items-end mb-6 pb-2">
           <div>
-            <p class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-[#CCFF00] inline-block border border-[#09090B]"></span>
-              Vitrina Oficial
+            <p class="text-[10px] font-black uppercase tracking-widest text-[#707072] flex items-center gap-1.5 mb-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></span>
+              MENA STORE
             </p>
-            <h2 id="titulo-seccion-catalogo" class="text-3xl font-black italic uppercase tracking-tight text-[#09090B]">Todo el Catálogo</h2>
+            <h2 id="titulo-seccion-catalogo" class="text-3xl font-extrabold uppercase tracking-tighter text-[#111111] font-syne">Todo el Catálogo</h2>
           </div>
           <span id="contador" class="text-xs font-bold uppercase tracking-wider text-zinc-500">Cargando...</span>
         </div>
@@ -251,12 +256,12 @@
 
     <!-- Vista 2: Historial de Pedidos -->
     <section id="vista-pedidos" class="hidden space-y-6">
-      <div class="flex justify-between items-end border-b border-zinc-200 pb-3">
+      <div class="flex justify-between items-end border-b border-[#F4F4F5] pb-3">
         <div>
-          <p class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-500">Control de Ventas</p>
-          <h2 class="text-3xl font-black italic uppercase tracking-tight text-[#09090B]">Pedidos Recibidos</h2>
+          <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">Control de Ventas</p>
+          <h2 class="text-3xl font-extrabold uppercase tracking-tighter text-[#111111] font-syne">Pedidos Recibidos</h2>
         </div>
-        <button onclick="cargarPedidos()" class="text-xs font-bold uppercase tracking-wider bg-zinc-100 hover:bg-zinc-200 px-3.5 py-2 rounded-lg transition">Actualizar Lista</button>
+        <button onclick="cargarPedidos()" class="text-xs font-bold uppercase tracking-wider bg-[#F5F5F5] hover:bg-zinc-200 px-4 py-2.5 rounded-full transition">Actualizar Lista</button>
       </div>
 
       <div id="lista-pedidos-admin" class="space-y-4">
@@ -266,69 +271,68 @@
 
   </main>
 
-  <!-- Pie de página comercial -->
-  <footer class="bg-[#09090B] text-zinc-300 border-t border-zinc-800 mt-16">
-    <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
+  <!-- Pie de página comercial minimalista -->
+  <footer class="bg-[#111111] text-[#A1A1AA] mt-20">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-sm border-t border-zinc-800">
       <div>
-        <h3 class="text-2xl font-black italic tracking-tight text-white mb-3 font-sport">
-          MENA<span class="bg-[#CCFF00] text-[#09090B] px-1.5 py-0.5 ml-0.5 not-italic rounded-sm">STORE</span>
+        <h3 class="text-2xl font-black uppercase tracking-tighter text-white mb-4 font-syne">
+          MENA STORE
         </h3>
-        <p class="text-zinc-400 text-xs leading-relaxed">
-          Tienda deportiva en Costa Rica. Camisetas oficiales, indumentaria y accesorios para entrenar y apoyar a tu equipo.
+        <p class="text-zinc-400 text-xs leading-relaxed max-w-xs">
+          Tienda deportiva en Costa Rica. Camisetas oficiales, indumentaria y accesorios con envíos rápidos en todo el territorio nacional.
         </p>
       </div>
       <div>
-        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-3">Categorías</h4>
-        <ul class="space-y-2 text-xs text-zinc-400">
-          <li><button onclick="seleccionarCategoria('Camisetas')" class="hover:text-[#CCFF00] transition">Camisetas de Fútbol</button></li>
-          <li><button onclick="seleccionarCategoria('Calzado')" class="hover:text-[#CCFF00] transition">Calzado Deportivo</button></li>
-          <li><button onclick="seleccionarCategoria('Balones')" class="hover:text-[#CCFF00] transition">Balones</button></li>
-          <li><button onclick="seleccionarCategoria('Accesorios')" class="hover:text-[#CCFF00] transition">Accesorios</button></li>
+        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-4">Categorías</h4>
+        <ul class="space-y-3.5 text-xs">
+          <li><button onclick="seleccionarCategoria('Camisetas')" class="hover:text-white transition">Camisetas de Fútbol</button></li>
+          <li><button onclick="seleccionarCategoria('Calzado')" class="hover:text-white transition">Calzado Deportivo</button></li>
+          <li><button onclick="seleccionarCategoria('Balones')" class="hover:text-white transition">Balones</button></li>
+          <li><button onclick="seleccionarCategoria('Accesorios')" class="hover:text-white transition">Accesorios</button></li>
         </ul>
       </div>
       <div>
-        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-3">Ayuda al Cliente</h4>
-        <ul class="space-y-2 text-xs text-zinc-400">
-          <li><button onclick="abrirGuiaTallas()" class="hover:text-[#CCFF00] transition">Guía de Tallas</button></li>
-          <li><span>Pagos: SINPE Móvil / Transferencia</span></li>
-          <li><span>Envíos por Correos de Costa Rica / Mensajería</span></li>
+        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-4">Ayuda al Cliente</h4>
+        <ul class="space-y-3.5 text-xs">
+          <li><button onclick="abrirGuiaTallas()" class="hover:text-white transition">Guía de Tallas</button></li>
+          <li><span class="text-zinc-400">Pagos: SINPE Móvil y Transferencia</span></li>
+          <li><span class="text-zinc-400">Entregas por Correos de Costa Rica</span></li>
         </ul>
       </div>
       <div>
-        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-3">Estado del Sitio</h4>
-        <p class="text-xs text-[#CCFF00] font-semibold mb-2">PAGINA EN CONSTRUCCIÓN :)</p>
-        <p class="text-xs text-zinc-400">Desarrollado por <span class="text-white font-bold">IMENA</span></p>
+        <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-4">Desarrollo</h4>
+        <p class="text-xs font-semibold text-white uppercase tracking-wider mb-2">Desarrollado por <span class="underline underline-offset-4 decoration-zinc-500 font-bold">IMENA</span></p>
       </div>
     </div>
   </footer>
 
   <!-- Modal Vista Rápida y Selector de Talla -->
-  <div id="modal-detalle" class="hidden fixed inset-0 bg-[#09090B]/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-zinc-200 grid grid-cols-1 md:grid-cols-2">
-      <div class="bg-[#F4F4F5] p-6 flex items-center justify-center h-72 md:h-auto">
+  <div id="modal-detalle" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden grid grid-cols-1 md:grid-cols-2 animate-[scaleUp_0.15s_ease-out]">
+      <div class="bg-[#F5F5F5] p-6 flex items-center justify-center h-72 md:h-auto">
         <img id="detalle-imagen" src="" alt="" class="max-h-72 w-full object-contain">
       </div>
-      <div class="p-6 flex flex-col justify-between space-y-5">
+      <div class="p-8 flex flex-col justify-between space-y-6">
         <div>
-          <div class="flex justify-between items-start gap-2">
-            <span id="detalle-categoria" class="bg-[#09090B] text-[#CCFF00] text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm"></span>
-            <button onclick="cerrarModalDetalle()" class="text-zinc-400 hover:text-[#09090B] font-bold text-2xl leading-none">&times;</button>
+          <div class="flex justify-between items-start gap-2 mb-3">
+            <span id="detalle-categoria" class="bg-[#111111] text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded"></span>
+            <button onclick="cerrarModalDetalle()" class="text-zinc-400 hover:text-black font-bold text-2xl leading-none">&times;</button>
           </div>
-          <h3 id="detalle-nombre" class="text-lg font-extrabold text-[#09090B] mt-2"></h3>
-          <p id="detalle-precio" class="text-3xl font-black text-[#09090B] mt-2 font-sport"></p>
+          <h3 id="detalle-nombre" class="text-xl font-bold uppercase tracking-tight text-[#111111] font-syne"></h3>
+          <p id="detalle-precio" class="text-3xl font-extrabold text-[#111111] mt-2 font-syne"></p>
           <p id="detalle-stock" class="text-xs text-zinc-500 mt-1"></p>
 
-          <!-- Selector de Talla -->
-          <div id="bloque-selector-talla" class="mt-5">
+          <!-- Selector de Tallas Minimalista -->
+          <div id="bloque-selector-talla" class="mt-6">
             <div class="flex justify-between items-center mb-2">
-              <label class="text-xs font-bold uppercase tracking-wider text-zinc-700">Selecciona tu talla:</label>
-              <button type="button" onclick="abrirGuiaTallas()" class="text-[11px] text-[#09090B] underline font-semibold">Ver medidas</button>
+              <label class="text-xs font-bold uppercase tracking-wider text-zinc-500">Selecciona tu talla:</label>
+              <button type="button" onclick="abrirGuiaTallas()" class="text-[11px] text-[#111111] underline font-semibold hover:opacity-85 transition">Ver medidas</button>
             </div>
-            <div id="opciones-talla" class="flex flex-wrap gap-2"></div>
+            <div id="opciones-talla" class="flex flex-wrap gap-2.5"></div>
           </div>
         </div>
 
-        <button id="btn-confirmar-detalle" onclick="confirmarAgregarDesdeDetalle()" class="w-full bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white font-black text-xs uppercase tracking-wider py-3.5 rounded-full transition">
+        <button id="btn-confirmar-detalle" onclick="confirmarAgregarDesdeDetalle()" class="w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-full transition shadow-sm">
           Añadir al Carrito
         </button>
       </div>
@@ -336,52 +340,53 @@
   </div>
 
   <!-- Modal Guía de Tallas -->
-  <div id="modal-tallas" class="hidden fixed inset-0 bg-[#09090B]/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-zinc-200">
-      <div class="flex justify-between items-center mb-4 border-b pb-3">
-        <h3 class="text-2xl font-black uppercase tracking-tight text-[#09090B] font-sport">Guía de Tallas (Camisetas)</h3>
-        <button onclick="cerrarGuiaTallas()" class="text-zinc-400 hover:text-[#09090B] font-bold text-xl">&times;</button>
+  <div id="modal-tallas" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6">
+      <div class="flex justify-between items-center mb-5 border-b border-[#F4F4F5] pb-3">
+        <h3 class="text-xl font-bold uppercase tracking-tight text-[#111111] font-syne">Guía de Tallas (Camisetas)</h3>
+        <button onclick="cerrarGuiaTallas()" class="text-zinc-400 hover:text-black font-bold text-xl">&times;</button>
       </div>
       <p class="text-xs text-zinc-500 mb-4">Medidas aproximadas en centímetros (versión aficionado / corte regular):</p>
-      <table class="w-full text-xs text-left border border-zinc-200">
-        <thead class="bg-[#09090B] text-[#CCFF00] font-bold uppercase">
+      <table class="w-full text-xs text-left border border-[#ECECEB] rounded-xl overflow-hidden">
+        <thead class="bg-[#F5F5F5] text-[#111111] font-bold uppercase">
           <tr>
-            <th class="p-2.5">Talla</th>
-            <th class="p-2.5">Pecho (cm)</th>
-            <th class="p-2.5">Largo (cm)</th>
+            <th class="p-3">Talla</th>
+            <th class="p-3">Pecho (cm)</th>
+            <th class="p-3">Largo (cm)</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-zinc-200">
-          <tr><td class="p-2.5 font-bold">S</td><td class="p-2.5">49 - 51 cm</td><td class="p-2.5">69 - 71 cm</td></tr>
-          <tr><td class="p-2.5 font-bold">M</td><td class="p-2.5">52 - 54 cm</td><td class="p-2.5">72 - 74 cm</td></tr>
-          <tr><td class="p-2.5 font-bold">L</td><td class="p-2.5">55 - 57 cm</td><td class="p-2.5">75 - 77 cm</td></tr>
-          <tr><td class="p-2.5 font-bold">XL</td><td class="p-2.5">58 - 60 cm</td><td class="p-2.5">78 - 80 cm</td></tr>
+        <tbody class="divide-y divide-[#F4F4F5]">
+          <tr><td class="p-3 font-semibold">S</td><td class="p-3">49 - 51 cm</td><td class="p-3">69 - 71 cm</td></tr>
+          <tr><td class="p-3 font-semibold">M</td><td class="p-3">52 - 54 cm</td><td class="p-3">72 - 74 cm</td></tr>
+          <tr><td class="p-3 font-semibold">L</td><td class="p-3">55 - 57 cm</td><td class="p-3">75 - 77 cm</td></tr>
+          <tr><td class="p-3 font-semibold">XL</td><td class="p-3">58 - 60 cm</td><td class="p-3">78 - 80 cm</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- Drawer lateral del Carrito de Compras -->
-  <div id="drawer-carrito" class="hidden fixed inset-0 bg-[#09090B]/70 backdrop-blur-sm z-50 flex justify-end">
+  <div id="drawer-carrito" class="hidden fixed inset-0 bg-black/65 backdrop-blur-sm z-50 flex justify-end">
     <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between">
-      <div class="p-5 border-b flex justify-between items-center bg-[#09090B] text-white">
-        <h3 class="text-xl font-black uppercase tracking-wider font-sport text-[#CCFF00]">Tu Carrito</h3>
-        <button onclick="cerrarCarrito()" class="text-zinc-400 hover:text-white text-2xl leading-none">&times;</button>
+      <div class="p-6 border-b border-[#F4F4F5] flex justify-between items-center">
+        <h3 class="text-xl font-bold uppercase tracking-tighter text-[#111111] font-syne">Tu Carrito</h3>
+        <button onclick="cerrarCarrito()" class="text-zinc-400 hover:text-black text-2xl leading-none">&times;</button>
       </div>
 
-      <div id="lista-carrito" class="p-5 flex-grow overflow-y-auto space-y-4"></div>
+      <div id="lista-carrito" class="p-6 flex-grow overflow-y-auto space-y-4"></div>
 
-      <div class="p-5 border-t bg-zinc-50 space-y-3">
+      <div class="p-6 bg-[#F5F5F5] space-y-4">
+        <!-- Campos en cajas integradas -->
         <div class="grid grid-cols-2 gap-2">
-          <input type="text" id="cliente-nombre" placeholder="Tu nombre (opcional)" class="bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs outline-none focus:border-[#09090B]">
-          <input type="tel" id="cliente-telefono" placeholder="Tu teléfono (opcional)" class="bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs outline-none focus:border-[#09090B]">
+          <input type="text" id="cliente-nombre" placeholder="Nombre (opcional)" class="bg-white rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-[#111111] border border-[#E4E4E7] transition">
+          <input type="tel" id="cliente-telefono" placeholder="Teléfono (opcional)" class="bg-white rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-[#111111] border border-[#E4E4E7] transition">
         </div>
 
-        <div class="flex justify-between items-center text-lg font-black text-[#09090B] pt-1">
-          <span class="text-sm uppercase tracking-wider">Total estimado:</span>
-          <span id="total-carrito" class="text-2xl font-sport">₡0</span>
+        <div class="flex justify-between items-center text-lg font-black text-[#111111] pt-2">
+          <span class="text-xs uppercase tracking-wider text-zinc-500 font-bold">Total estimado:</span>
+          <span id="total-carrito" class="text-2xl font-extrabold font-syne">₡0</span>
         </div>
-        <button id="btn-confirmar-wa" onclick="enviarPedidoWhatsApp()" class="w-full bg-[#CCFF00] hover:bg-[#d9ff33] text-[#09090B] font-black text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm">
+        <button id="btn-confirmar-wa" onclick="enviarPedidoWhatsApp()" class="w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-full transition shadow-sm">
           Confirmar Pedido por WhatsApp
         </button>
         <button onclick="vaciarCarrito()" class="w-full text-xs text-zinc-500 hover:text-red-600 py-1 transition">
@@ -392,22 +397,22 @@
   </div>
 
   <!-- Modal flotante de inicio de sesión -->
-  <div id="modal-login" class="hidden fixed inset-0 bg-[#09090B]/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-zinc-200">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-2xl font-black uppercase tracking-tight text-[#09090B] font-sport">Panel Administrativo</h3>
-        <button onclick="cerrarModalLogin()" class="text-zinc-400 hover:text-zinc-600 font-bold text-lg">&times;</button>
+  <div id="modal-login" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl shadow-xl max-w-sm w-full p-6">
+      <div class="flex justify-between items-center mb-5 border-b pb-3">
+        <h3 class="text-xl font-bold uppercase tracking-tight text-[#111111] font-syne">Panel Administrativo</h3>
+        <button onclick="cerrarModalLogin()" class="text-zinc-400 hover:text-black font-bold text-lg">&times;</button>
       </div>
       <form id="form-login" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">Correo electrónico</label>
-          <input type="email" id="login-email" required placeholder="admin@menastore.com" class="w-full border rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Correo electrónico</label>
+          <input type="email" id="login-email" required placeholder="admin@menastore.com" class="w-full border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-1">Contraseña</label>
-          <input type="password" id="login-password" required placeholder="••••••••" class="w-full border rounded-lg p-2.5 text-sm focus:border-[#09090B] outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full border border-[#E4E4E7] rounded-xl p-3 text-sm focus:border-[#111111] outline-none transition">
         </div>
-        <button type="submit" id="btn-submit-login" class="w-full bg-[#09090B] hover:bg-[#CCFF00] hover:text-[#09090B] text-white font-black text-xs uppercase tracking-wider py-3 rounded-lg transition">
+        <button type="submit" id="btn-submit-login" class="w-full bg-[#111111] hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-full transition shadow-sm">
           Iniciar Sesión
         </button>
       </form>
