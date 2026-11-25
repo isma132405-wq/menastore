@@ -1,7 +1,7 @@
 // 1. Conexión a Supabase y configuración de tienda
 const SUPABASE_URL = 'https://hxpcucivvggfcnarwuku.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_kHoFrLbY_xMcH8XILfSkhw_LfDXMUtQ';
-const TELEFONO_WHATSAPP = '50685438203'; // Cambia por tu número real con código 506
+const TELEFONO_WHATSAPP = '50684316789'; // Cambia por tu número real con código 506
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Referencias del DOM
