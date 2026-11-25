@@ -1,7 +1,7 @@
 // 1. Conexión a Supabase y configuración de tienda
 const SUPABASE_URL = 'https://hxpcucivvggfcnarwuku.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_kHoFrLbY_xMcH8XILfSkhw_LfDXMUtQ';
-const TELEFONO_WHATSAPP = '50684316789'; // Cambia por tu número real con código 506
+const SUPABASE_KEY = 'PEGA_AQUI_TU_LLAVE_EXACTA_DE_SUPABASE';
+const TELEFONO_WHATSAPP = '50688888888'; // Cambia por tu número real con código 506
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Referencias del DOM
@@ -478,7 +478,7 @@ async function enviarPedidoWhatsApp() {
   window.open(url, '_blank');
 }
 
-// 7. Gestión de Historial de Pedidos y Descuento Automático de Stock (Admin)
+// 7. Gestión de Historial de Pedidos, Métricas y Logística (Admin)
 async function cargarPedidos() {
   const { data: pedidos, error } = await supabaseClient
     .from('pedidos')
@@ -492,36 +492,65 @@ async function cargarPedidos() {
   }
 
   pedidosCache = pedidos;
-  const pendientes = pedidos.filter(p => p.estado === 'Pendiente').length;
-  badgePedidosPendientes.textContent = pendientes;
+  actualizarMetricasVentas(pedidos);
+  renderizarListaPedidos();
+}
 
-  if (pedidos.length === 0) {
-    listaPedidosAdmin.innerHTML = `<div class="text-center py-14 bg-[#F5F5F5] rounded-3xl text-zinc-400 text-sm">Aún no se han recibido pedidos desde la tienda.</div>`;
+function actualizarMetricasVentas(pedidos) {
+  const completados = pedidos.filter(p => p.estado === 'Completado');
+  const pendientes = pedidos.filter(p => p.estado === 'Pendiente');
+
+  const totalIngresos = completados.reduce((acc, p) => acc + Number(p.total || 0), 0);
+  const totalPorCobrar = pendientes.reduce((acc, p) => acc + Number(p.total || 0), 0);
+
+  badgePedidosPendientes.textContent = pendientes.length;
+
+  const elIngresos = document.getElementById('metrica-ingresos');
+  const elPendientes = document.getElementById('metrica-pendientes');
+  const elMontoPendiente = document.getElementById('metrica-monto-pendiente');
+  const elCompletados = document.getElementById('metrica-completados');
+
+  if (elIngresos) elIngresos.textContent = `₡${totalIngresos.toLocaleString()}`;
+  if (elPendientes) elPendientes.textContent = pendientes.length;
+  if (elMontoPendiente) elMontoPendiente.textContent = `₡${totalPorCobrar.toLocaleString()} por confirmar`;
+  if (elCompletados) elCompletados.textContent = completados.length;
+}
+
+function renderizarListaPedidos() {
+  const filtroSelect = document.getElementById('filtro-estado-pedidos');
+  const estadoFiltro = filtroSelect ? filtroSelect.value : 'Todos';
+
+  const listaFiltrada = estadoFiltro === 'Todos'
+    ? pedidosCache
+    : pedidosCache.filter(p => p.estado === estadoFiltro);
+
+  if (listaFiltrada.length === 0) {
+    listaPedidosAdmin.innerHTML = `<div class="text-center py-14 bg-[#F5F5F5] rounded-3xl text-zinc-400 text-sm">No hay pedidos registrados en esta categoría.</div>`;
     return;
   }
 
-  listaPedidosAdmin.innerHTML = pedidos.map(pedido => {
+  listaPedidosAdmin.innerHTML = listaFiltrada.map(pedido => {
     const fechaFormateada = new Date(pedido.fecha).toLocaleString('es-CR', {
       day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
     const esPendiente = pedido.estado === 'Pendiente';
     const badgeEstado = esPendiente
-      ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold uppercase px-3 py-1 rounded">Pendiente</span>`
+      ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full">Pendiente</span>`
       : pedido.estado === 'Completado'
-        ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase px-3 py-1 rounded">Completado (Stock descontado)</span>`
-        : `<span class="bg-red-100 text-red-700 text-[10px] font-bold uppercase px-3 py-1 rounded">Cancelado</span>`;
+        ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full">Completado</span>`
+        : `<span class="bg-red-100 text-red-700 text-[10px] font-bold uppercase px-3 py-1 rounded-full">Cancelado</span>`;
 
     const itemsHtml = (pedido.detalle || []).map(item => `
-      <li class="text-xs text-zinc-700 flex justify-between py-1 border-b border-zinc-100 last:border-0">
-        <span><strong>${item.cantidad}x</strong> ${item.nombre} <span class="text-zinc-400 font-medium">(Talla: ${item.talla || 'Única'})</span></span>
+      <li class="text-xs text-zinc-700 flex justify-between py-1.5 border-b border-zinc-200/60 last:border-0">
+        <span><strong>${item.cantidad}x</strong> ${item.nombre} <span class="text-zinc-500 font-medium">(Talla: ${item.talla || 'Única'})</span></span>
         <span class="font-bold">₡${(item.precio * item.cantidad).toLocaleString()}</span>
       </li>
     `).join('');
 
     const accionesPedido = esPendiente
-      ? `<div class="flex flex-wrap gap-2 pt-3 border-t mt-3 border-[#E4E4E7]">
-           <button onclick="aprobarYDescontarStock(${pedido.id})" class="bg-[#111111] hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full transition shadow-sm">
+      ? `<div class="flex flex-wrap gap-2 pt-3 border-t border-[#E4E4E7]">
+           <button onclick="aprobarYDescontarStock(${pedido.id})" class="bg-[#111111] hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition shadow-sm">
              Completar y Descontar Stock
            </button>
            <button onclick="cambiarEstadoPedido(${pedido.id}, 'Cancelado')" class="bg-white border border-[#E4E4E7] hover:border-red-600 text-zinc-600 hover:text-red-600 text-xs font-bold uppercase px-4 py-2.5 rounded-full transition">
@@ -534,7 +563,7 @@ async function cargarPedidos() {
 
     return `
       <div class="bg-white rounded-3xl border border-[#E4E4E7] p-6 shadow-sm space-y-4">
-        <div class="flex flex-wrap justify-between items-start gap-2 pb-2">
+        <div class="flex flex-wrap justify-between items-start gap-2">
           <div>
             <div class="flex items-center gap-2.5">
               <span class="text-xl font-bold font-syne text-[#111111]">Orden #${pedido.id}</span>
@@ -549,14 +578,58 @@ async function cargarPedidos() {
             <p class="text-2xl font-extrabold font-syne text-[#111111]">₡${Number(pedido.total).toLocaleString()}</p>
           </div>
         </div>
-        <ul class="bg-[#F5F5F5] rounded-2xl p-4 divide-y divide-[#E4E4E7]/40">${itemsHtml}</ul>
+
+        <ul class="bg-[#F5F5F5] rounded-2xl p-4">${itemsHtml}</ul>
+
+        <!-- Registro de SINPE Móvil y Guía de Envío -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-[#FAFAFA] p-3.5 rounded-2xl border border-[#F4F4F5]">
+          <div class="sm:col-span-5">
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Comprobante SINPE / Ref.</label>
+            <input type="text" id="sinpe-${pedido.id}" value="${pedido.comprobante_sinpe || ''}" placeholder="Ej. 202611249981" class="w-full bg-white border border-[#E4E4E7] rounded-xl px-3 py-2 text-xs outline-none focus:border-[#111111]">
+          </div>
+          <div class="sm:col-span-5">
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Guía Correos CR / Mensajero</label>
+            <input type="text" id="guia-${pedido.id}" value="${pedido.guia_envio || ''}" placeholder="Ej. CR123456789" class="w-full bg-white border border-[#E4E4E7] rounded-xl px-3 py-2 text-xs outline-none focus:border-[#111111]">
+          </div>
+          <div class="sm:col-span-2 sm:pt-4">
+            <button onclick="guardarLogisticaPedido(${pedido.id})" class="w-full bg-white hover:bg-[#111111] text-[#111111] hover:text-white border border-[#111111] text-[11px] font-bold uppercase py-2 rounded-xl transition">
+              Guardar
+            </button>
+          </div>
+        </div>
+
         ${accionesPedido}
       </div>
     `;
   }).join('');
 }
 
-async function  aprobarYDescontarStock(pedidoId) {
+async function guardarLogisticaPedido(pedidoId) {
+  const sinpe = document.getElementById(`sinpe-${pedidoId}`).value.trim();
+  const guia = document.getElementById(`guia-${pedidoId}`).value.trim();
+
+  const { error } = await supabaseClient
+    .from('pedidos')
+    .update({
+      comprobante_sinpe: sinpe,
+      guia_envio: guia
+    })
+    .eq('id', pedidoId);
+
+  if (error) {
+    alert('Error al guardar los datos: ' + error.message);
+    return;
+  }
+
+  const pedidoLocal = pedidosCache.find(p => p.id === pedidoId);
+  if (pedidoLocal) {
+    pedidoLocal.comprobante_sinpe = sinpe;
+    pedidoLocal.guia_envio = guia;
+  }
+  alert(`Datos de SINPE y guía guardados en la Orden #${pedidoId}.`);
+}
+
+async function aprobarYDescontarStock(pedidoId) {
   const pedido = pedidosCache.find(p => p.id === pedidoId);
   if (!pedido) return;
 

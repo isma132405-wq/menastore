@@ -19,7 +19,6 @@
     h1, h2, h3, .font-syne {
       font-family: 'Syne', sans-serif;
     }
-    /* Estilos sutiles de carrusel */
     #hero-track {
       display: flex;
       transition: transform 0.70s cubic-bezier(0.25, 1, 0.5, 1);
@@ -52,7 +51,7 @@
         MENA STORE
       </a>
 
-      <!-- Buscador tipo Nike -->
+      <!-- Buscador -->
       <div class="order-3 md:order-2 w-full md:w-96">
         <div class="relative">
           <input type="text" id="buscador" oninput="aplicarFiltros()" placeholder="Buscar en MENA STORE..." class="w-full bg-[#F5F5F5] border-0 rounded-full pl-5 pr-12 py-2.5 text-sm outline-none focus:bg-[#EAEAEA] placeholder-zinc-500 transition">
@@ -161,7 +160,7 @@
 
     </div>
 
-    <!-- Flechas laterales sutiles -->
+    <!-- Flechas laterales -->
     <button onclick="moverHero(-1)" aria-label="Anterior" class="hidden sm:flex items-center justify-center absolute left-5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/5 hover:bg-white/15 text-white transition z-20">
       &#10094;
     </button>
@@ -169,7 +168,7 @@
       &#10095;
     </button>
 
-    <!-- Indicadores inferiores (puntos) sutiles -->
+    <!-- Indicadores inferiores -->
     <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-20">
       <button onclick="irASlideHero(0)" class="hero-dot w-6 h-1 rounded-full bg-white transition-all"></button>
       <button onclick="irASlideHero(1)" class="hero-dot w-2 h-1 rounded-full bg-white/30 hover:bg-white/50 transition-all"></button>
@@ -194,7 +193,7 @@
     <!-- Vista 1: Inventario y Catálogo -->
     <div id="layout-principal" class="grid grid-cols-1 gap-12">
       
-      <!-- Panel de administración en caja gris minimalista -->
+      <!-- Panel de administración -->
       <section id="panel-admin" class="hidden lg:col-span-1 bg-[#F5F5F5] p-6 rounded-3xl h-fit border border-[#ECECEB]">
         <div class="flex justify-between items-center mb-6 border-b border-zinc-200 pb-3">
           <h2 id="titulo-form-admin" class="text-xl font-bold uppercase tracking-tight text-[#111111] font-syne">Nuevo Artículo</h2>
@@ -254,14 +253,41 @@
       </section>
     </div>
 
-    <!-- Vista 2: Historial de Pedidos -->
-    <section id="vista-pedidos" class="hidden space-y-6">
-      <div class="flex justify-between items-end border-b border-[#F4F4F5] pb-3">
+    <!-- Vista 2: Historial de Pedidos y Métricas -->
+    <section id="vista-pedidos" class="hidden space-y-8">
+      <div class="flex flex-wrap justify-between items-end border-b border-[#F4F4F5] pb-4 gap-4">
         <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">Control de Ventas</p>
-          <h2 class="text-3xl font-extrabold uppercase tracking-tighter text-[#111111] font-syne">Pedidos Recibidos</h2>
+          <p class="text-[10px] font-extrabold uppercase tracking-widest text-[#707072]">Control Operativo</p>
+          <h2 class="text-3xl font-extrabold uppercase tracking-tighter text-[#111111] font-syne">Ventas y Despachos</h2>
         </div>
-        <button onclick="cargarPedidos()" class="text-xs font-bold uppercase tracking-wider bg-[#F5F5F5] hover:bg-zinc-200 px-4 py-2.5 rounded-full transition">Actualizar Lista</button>
+        <div class="flex items-center gap-2">
+          <select id="filtro-estado-pedidos" onchange="renderizarListaPedidos()" class="bg-[#F5F5F5] text-xs font-semibold px-4 py-2.5 rounded-full outline-none border border-transparent focus:border-[#111111]">
+            <option value="Todos">Todos los pedidos</option>
+            <option value="Pendiente">Pendientes de cobro/envío</option>
+            <option value="Completado">Completados</option>
+            <option value="Cancelado">Cancelados</option>
+          </select>
+          <button onclick="cargarPedidos()" class="text-xs font-bold uppercase tracking-wider bg-[#111111] text-white hover:bg-zinc-800 px-5 py-2.5 rounded-full transition">Actualizar</button>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Métricas -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="bg-[#111111] text-white p-6 rounded-3xl">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Ingresos Confirmados</p>
+          <p id="metrica-ingresos" class="text-3xl font-extrabold font-syne mt-2">₡0</p>
+          <p class="text-[11px] text-zinc-400 mt-1">Suma de órdenes completadas</p>
+        </div>
+        <div class="bg-[#F5F5F5] p-6 rounded-3xl border border-[#ECECEB]">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-[#707072]">Por Despachar / Cobrar</p>
+          <p id="metrica-pendientes" class="text-3xl font-extrabold font-syne text-[#111111] mt-2">0</p>
+          <p id="metrica-monto-pendiente" class="text-[11px] text-[#707072] mt-1">₡0 por confirmar</p>
+        </div>
+        <div class="bg-[#F5F5F5] p-6 rounded-3xl border border-[#ECECEB]">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-[#707072]">Ventas Cerradas</p>
+          <p id="metrica-completados" class="text-3xl font-extrabold font-syne text-[#111111] mt-2">0</p>
+          <p class="text-[11px] text-[#707072] mt-1">Pedidos entregados con éxito</p>
+        </div>
       </div>
 
       <div id="lista-pedidos-admin" class="space-y-4">
@@ -322,7 +348,7 @@
           <p id="detalle-precio" class="text-3xl font-extrabold text-[#111111] mt-2 font-syne"></p>
           <p id="detalle-stock" class="text-xs text-zinc-500 mt-1"></p>
 
-          <!-- Selector de Tallas Minimalista -->
+          <!-- Selector de Tallas -->
           <div id="bloque-selector-talla" class="mt-6">
             <div class="flex justify-between items-center mb-2">
               <label class="text-xs font-bold uppercase tracking-wider text-zinc-500">Selecciona tu talla:</label>
@@ -376,7 +402,6 @@
       <div id="lista-carrito" class="p-6 flex-grow overflow-y-auto space-y-4"></div>
 
       <div class="p-6 bg-[#F5F5F5] space-y-4">
-        <!-- Campos en cajas integradas -->
         <div class="grid grid-cols-2 gap-2">
           <input type="text" id="cliente-nombre" placeholder="Nombre (opcional)" class="bg-white rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-[#111111] border border-[#E4E4E7] transition">
           <input type="tel" id="cliente-telefono" placeholder="Teléfono (opcional)" class="bg-white rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-[#111111] border border-[#E4E4E7] transition">
